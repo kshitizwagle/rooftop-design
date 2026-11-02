@@ -3,6 +3,11 @@
 An interactive mobile-friendly Three.js model of a proposed rooftop home office (9 × 10 ft), living room (11 × 10 ft), and **separately accessible** bathroom (5 × 7 ft) with 10 ft walls and sloped EPS roofs.
 
 ## Features
+- Three layout options (switch at the top, or link directly with `#a`, `#b`, `#c`):
+  - **A · Two rooms** — separate office and living room, each with its own door
+  - **B · Studio, bed right** — one open 20 × 10 ft room, no partition; desk by the door, bed behind a ceiling-track curtain
+  - **C · Studio, bed left** — open room with the bed at the far end behind a curtain; desk and a small TV lounge by the door
+- Curtain toggle to see the studio open or closed off
 - Full 3D orbit, zoom and pan on desktop and mobile, with smooth camera moves
 - Views: Exterior, Dollhouse (walls cut at 4.5 ft), Plan, and Office / Living / Bath close-ups
 - Layers for roof, walls, furniture, electrical & data, plumbing, room labels and the proposed water tank
