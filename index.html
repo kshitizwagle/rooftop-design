@@ -1,41 +1,739 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Rooftop Studio | 3D Renovation Viewer</title><style>
-:root{color-scheme:dark;font:14px system-ui,-apple-system,Segoe UI,sans-serif;background:#10141e;color:#eff2f7}*{box-sizing:border-box}body{margin:0;overflow:hidden}#scene{position:fixed;inset:0}canvas{display:block}header{position:absolute;top:0;left:0;right:0;padding:18px 20px;pointer-events:none;background:linear-gradient(#0a0f1ccc,transparent)}h1{font-size:18px;margin:0;font-weight:700}header p{font-size:12px;opacity:.7;margin:5px 0}aside{position:absolute;top:90px;left:16px;width:278px;max-height:calc(100vh - 120px);overflow:auto;background:#141c2bed;border:1px solid #ffffff26;border-radius:16px;padding:16px;backdrop-filter:blur(18px);box-shadow:0 15px 50px #0005}aside h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#9eadd1;margin:15px 0 9px}aside h2:first-child{margin-top:0}button{background:#263246;color:#edf3ff;border:1px solid #45536c;border-radius:9px;padding:9px 10px;cursor:pointer;font:inherit}button.selected{background:#a277ff;color:#11101a;border-color:#a277ff}button:focus-visible,input:focus-visible{outline:2px solid #61ffca}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.item{display:flex;align-items:center;gap:9px;font-size:12px;margin:12px 0}.item input{accent-color:#a277ff}.key{font-size:11px;color:#aab6c9;line-height:1.6}.small{font-size:11px;color:#aab6c9}.info{margin-top:14px;padding:12px;border:1px solid #ffffff20;border-radius:10px;background:#101725}#selection{min-height:56px;line-height:1.5}.chip{display:inline-block;background:#27394a;color:#61ffca;border-radius:6px;padding:2px 6px;font-size:10px;margin-bottom:5px}footer{position:absolute;bottom:12px;right:15px;background:#131c2bcc;padding:9px 12px;border-radius:10px;color:#becad9;font-size:11px;pointer-events:none}#menu{display:none;position:absolute;top:17px;right:15px;z-index:4}#loader{position:absolute;inset:0;background:#10141e;display:grid;place-items:center;z-index:9;color:#c8d1e0}#loader.hidden{display:none}@media(max-width:700px){aside{top:auto;bottom:12px;left:10px;right:10px;width:auto;max-height:55vh;display:none}aside.open{display:block}#menu{display:block}footer{bottom:12px;left:10px;right:10px;text-align:center;white-space:nowrap;font-size:10px}aside.open~footer{display:none}header{padding:17px 13px}h1{font-size:16px}}
-</style></head><body><div id="scene"></div><div id="loader">Loading interactive model…</div><header><h1>ROOFTOP STUDIO · RENOVATION CONCEPT</h1><p>Office 9 × 10 ft · Lounge 11 × 10 ft · Independent bath 5 × 7 ft · 10 ft walls</p></header><button id="menu" aria-expanded="false">☰ Controls</button><aside id="panel"><h2>Camera</h2><div class="grid" id="views"><button data-view="exterior">Exterior</button><button data-view="cutaway" class="selected">Cutaway</button><button data-view="top">Floor plan</button><button data-view="office">Office</button><button data-view="living">Living</button><button data-view="bath">Bathroom</button></div><h2>Layers</h2><label class="item"><input type="checkbox" id="roof" /> Show sloped EPS roof</label><label class="item"><input type="checkbox" id="walls" checked /> Show external walls</label><label class="item"><input type="checkbox" id="furniture" checked /> Show furniture and fixtures</label><label class="item"><input type="checkbox" id="electrical" checked /> Show switches, sockets and LAN</label><label class="item"><input type="checkbox" id="plumbing" checked /> Show plumbing and drainage</label><label class="item"><input type="checkbox" id="labels" checked /> Show room labels</label><label class="item"><input type="checkbox" id="tank" checked /> Show relocated water tank (proposed)</label><h2>Explore</h2><div class="key">Drag to rotate · Pinch / scroll to zoom · Two-finger drag to pan · Tap a colored marker or object for details</div><div class="info" id="selection"><span class="chip">SELECT AN OBJECT</span><div>Tap a fixture, socket, light or furniture piece to inspect it.</div></div><h2>Project assumptions</h2><div class="small">Conceptual layout replaces existing room. Stair entry retained. Separate bathroom door faces open common walkway. Water tank position is a provisional location, subject to a structural engineer's approval. All service locations are indicative.</div></aside><footer>Concept only · Verify measurements, structural loads and service routing on site</footer>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script><script type="module">
-import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-const scene=new THREE.Scene();scene.background=new THREE.Color('#162332');scene.fog=new THREE.Fog('#162332',45,110);const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,200);camera.position.set(29,23,33);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.5;document.querySelector('#scene').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.target.set(11,2,5);orbit.maxPolarAngle=Math.PI*.49;orbit.minDistance=5;orbit.maxDistance=80;scene.add(new THREE.HemisphereLight(0xc1dcff,0x677a79,2.8));const sun=new THREE.DirectionalLight(0xffe6c0,3);sun.position.set(-12,24,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
-const groups={structure:new THREE.Group(),walls:new THREE.Group(),roof:new THREE.Group(),furniture:new THREE.Group(),electrical:new THREE.Group(),plumbing:new THREE.Group(),labels:new THREE.Group(),tank:new THREE.Group()};Object.values(groups).forEach(g=>scene.add(g));const interact=[];const mat=(c,metalness=0,roughness=.82)=>new THREE.MeshStandardMaterial({color:c,metalness,roughness,side:THREE.DoubleSide});const M={concrete:mat('#71818e'),floor:mat('#bca991'),tile:mat('#8abbb9'),wall:mat('#dbe1e3'),partition:mat('#d0c9dc'),wood:mat('#a47d5d'),woodDark:mat('#604c43'),purple:mat('#8873ac'),sofa:mat('#7c8ca0'),dark:mat('#273748'),steel:mat('#586b75',.65,.35),glass:new THREE.MeshPhysicalMaterial({color:'#8bd0ee',transparent:true,opacity:.53,roughness:.08,metalness:.1,side:THREE.DoubleSide}),white:mat('#f5f4ec'),roof:mat('#8b9eb4',.38,.37),roof2:mat('#738da4',.38,.37),yellow:new THREE.MeshBasicMaterial({color:'#ffe176'}),red:new THREE.MeshBasicMaterial({color:'#ff7f81'}),blue:new THREE.MeshBasicMaterial({color:'#66c9ff'}),green:new THREE.MeshBasicMaterial({color:'#71efbc'})};
-function box(g,x,y,z,w,h,d,m,name,desc){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);if(name){o.userData={name,desc};interact.push(o)}return o}function cylinder(g,x,y,z,r,h,m,name,desc){const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,24),m);o.position.set(x,y,z);o.castShadow=true;g.add(o);if(name){o.userData={name,desc};interact.push(o)}return o}function line3(g,pts,color=.6){const geo=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));let l=new THREE.Line(geo,new THREE.LineBasicMaterial({color}));g.add(l)}function label(text,x,y,z){const c=document.createElement('canvas');c.width=512;c.height=96;const ctx=c.getContext('2d');ctx.fillStyle='rgba(14,21,34,.85)';ctx.fillRect(0,0,512,96);ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='bold 42px sans-serif';ctx.fillText(text,256,63);let t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false}));s.position.set(x,y,z);s.scale.set(5.3,1,1);groups.labels.add(s)}
-// Coordinate convention: front doors face +Z. Office x 0..9, living x 9..20, bath x 20..25, z 1.5..8.5.
-box(groups.structure,12.5,-.37,6.2,29,.7,16,M.concrete,'Existing RCC rooftop','Existing structural slab shown schematically; actual load capacity must be checked.');box(groups.structure,10,-.02,5,20,.11,10,M.floor);box(groups.structure,22.5,-.02,5,5,.11,7,M.tile);box(groups.structure,12.5,-.02,11.2,27,.08,2.4,M.concrete,'Common rooftop walkway','Open-air circulation area, accessible from existing staircase entry.');
-for(let x of [-1,26]){box(groups.structure,x,.45,6.1,.2,1.3,15,M.concrete)}box(groups.structure,12.5,.45,-1.7,28,1.3,.2,M.concrete);for(let x=-1;x<=26;x+=1.8)box(groups.structure,x,.55,13.2,.06,1.1,.06,M.steel);box(groups.structure,12.5,1.07,13.2,27,.06,.06,M.steel);
-function wall(x,y,z,w,h,d,m=M.wall){return box(groups.walls,x,y,z,w,h,d,m)}function door(x,z,width=2.65){box(groups.furniture,x,3.3,z,.09,6.6,width,M.wood,'Exterior door','Weather-resistant external door, dedicated rooftop access.');cylinder(groups.furniture,x+.08,3.3,z+width*.3,.09,.1,M.steel)}
-wall(4.5,5,0,9,10,.18);wall(14.5,5,0,11,10,.18);wall(0,5,5,.18,10,10);wall(9,5,5,.14,10,10,M.partition);wall(20,5,.7,.18,10,1.4);wall(20,5,9.3,.18,10,1.4);wall(25,5,5,.18,10,7);wall(22.5,5,1.5,5,10,.18);wall(22.5,5,8.5,5,10,.18);
-// Front walls with separate doorway recesses; lintel above each opening
-for(const [a,b] of [[0,2.2],[5.2,9],[9,12.7],[15.7,20]])wall((a+b)/2,5,10,b-a,10,.18);for(let x of [3.7,14.2])wall(x,8.5,10,3,3,.18);door(3.7,10.08,3);door(14.2,10.08,3);
-// Bathroom doorway in front-facing side, independent of either room, added slight projecting vestibule to connect bath to rooftop walk
-wall(22,5,8.5,1.1,10,.18);wall(24.5,5,8.5,1,10,.18);door(23.35,8.65,1.9);
-// glass windows schematic
-box(groups.walls,.04,5,4,.07,3,3.8,M.glass,'Office window','Daylight opening; verify exterior orientation.');box(groups.walls,14.5,5,.06,4,3,.06,M.glass,'Living window','Natural light and ventilation.');box(groups.walls,25.04,7,5,.08,1.8,1.4,M.glass,'Bathroom ventilation window','High level privacy glazing; exhaust fan also indicated.');
-// roof: main gable ridge along x. simple custom polygon meshes
-function roofPanel(g,vertices,m,name){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices.flat(),3));geo.computeVertexNormals();let mesh=new THREE.Mesh(geo,m);mesh.castShadow=true;g.add(mesh);mesh.userData={name,desc:'Sloped 75 mm EPS sandwich panel roof. Ridge/flashings and connections need detailed design.'};interact.push(mesh)}
-roofPanel(groups.roof,[[-.8,10,-.9],[20.8,10,-.9],[20.8,12.5,5],[-.8,10,-.9],[20.8,12.5,5],[-.8,12.5,5]],M.roof,'North roof slope');roofPanel(groups.roof,[[-.8,12.5,5],[20.8,12.5,5],[20.8,10,10.9],[-.8,12.5,5],[20.8,10,10.9],[-.8,10,10.9]],M.roof2,'South roof slope');roofPanel(groups.roof,[[19.5,11.8,4.6],[25.7,11.8,4.6],[25.7,10,9.2],[19.5,11.8,4.6],[25.7,10,9.2],[19.5,10,9.2]],M.roof,'Bathroom separate roof');
-// Furniture: office, desk and equipment
-box(groups.furniture,4.1,2.45,1.1,6.3,.22,1.8,M.wood,'Office desk','Approx 6 ft wide desk. Dual monitor setup, power, LAN and cable channel.');for(let x of [1.25,6.9])box(groups.furniture,x,1.25,1.1,.16,2.5,1.55,M.steel);for(let x of [3.2,5]){box(groups.furniture,x,3.2,1.05,1.55,.9,.12,M.dark,'Monitor','Dual displays with wall/desk-mounted cable management.');box(groups.furniture,x,2.78,1.05,.12,.5,.12,M.steel)}box(groups.furniture,4.2,1.1,3,1.8,.3,1.8,M.dark,'Ergonomic chair','Swivel chair with adequate clearance behind desk.');box(groups.furniture,4.2,1.7,3.5,1.8,2,.24,M.dark);box(groups.furniture,7.8,3.1,2.3,1.35,6,3.6,M.woodDark,'Office storage','Tall bookshelf / storage cabinet.');box(groups.furniture,2.4,1.35,8,2.5,2.5,1,M.purple,'Reading chair','Secondary office reading/lounge chair.');
-// Living area
-box(groups.furniture,12.6,1.0,7.6,5.6,1.6,2.1,M.sofa,'Sofa','Three-seater sofa arranged towards TV wall.');box(groups.furniture,12.6,1.8,8.4,5.6,1.6,.5,M.sofa);box(groups.furniture,14.2,.8,4.9,3.4,.55,1.9,M.wood,'Coffee table','Low center table with clear circulation.');box(groups.furniture,18.5,1.15,3,1.2,2.2,4.2,M.woodDark,'TV console','Media storage and concealed power and data routing.');box(groups.furniture,18.0,3.8,3, .12,2.2,3.4,M.dark,'TV','Wall mounted television; nearby power, CAT6 and HDMI conduit.');box(groups.furniture,10.6,2.6,2.0,1.2,4.5,2.2,M.woodDark,'Display shelf','Living room shelving.');
-// bath basin WC shower
-box(groups.furniture,21.1,2.4,2.8,1.5,.28,1.0,M.white,'Bathroom basin','Wall mounted washbasin with mixer, supply, trap and waste connection.');box(groups.furniture,21.1,4.3,2.78,1.7,2.0,.08,M.glass,'Basin mirror','Mirror over washbasin with an optional vanity light.');cylinder(groups.furniture,23.7,1.05,3.0,.66,1.1,M.white,'WC','Western commode with flush and nearby cold-water supply.');box(groups.furniture,23.7,1.6,2.5,1.5,1.3,.7,M.white);box(groups.furniture,23.1,.1,7.1,2.4,.11,2.0,M.tile,'Shower area','Wet zone with anti-slip floor, mixer, and slope to drain.');cylinder(groups.furniture,24.2,7.6,7.0,.36,.12,M.steel,'Shower head','Overhead shower; waterproof walls and separate drainage.');
-// Relocated tank indicative on separate platform behind bath
-box(groups.tank,23.6,3,-.4,3.5,.35,3.5,M.steel,'Proposed tank platform','Concept location only; do not assume slab is capable of carrying full tank load.');for(let x of [22.2,25])for(let z of [-1.8,1])box(groups.tank,x,1.45,z,.15,2.9,.15,M.steel);cylinder(groups.tank,23.6,4.3,-.4,1.35,2.3,M.dark,'Relocated water tank','Location tentative. Water weight: ~1 tonne per 1,000 L. Requires structural verification and maintenance access.');
-// markers with purpose, height, service details
-function point(g,x,y,z,color,title,desc){const o=new THREE.Mesh(new THREE.SphereGeometry(.18,14,10),color);o.position.set(x,y,z);o.userData={name:title,desc};g.add(o);interact.push(o)}
-point(groups.electrical,2.15,4,9.73,M.yellow,'Office light switch','By door, approximately 1.2 m above finished floor (adjust for local preference).');point(groups.electrical,12.7,4,9.73,M.yellow,'Living light switch','Near independent entry door.');point(groups.electrical,22.1,4,8.25,M.yellow,'Bathroom light switch','Outside wet zone, convenient to separate bathroom entry.');
-for(let [x,y,z,title,desc] of [[2.8,1.3,.25,'Office desk power','Dedicated grounded outlets, surge protected equipment circuit.'],[5.5,1.3,.25,'Office spare socket','Extra socket near desk.'],[7.8,1.3,7.5,'Office general socket','Vacuum / devices.'],[18.5,1.3,1.1,'Living TV power','TV outlet and possible UPS point.'],[11,1.3,8.7,'Living socket','Near lounge seating.'],[19.4,1.3,8.7,'Living spare socket','Convenient general socket.']])point(groups.electrical,x,y,z,M.red,title,desc);
-point(groups.electrical,4.5,1.5,.3,M.blue,'Office CAT6 LAN','Two RJ45 data ports routed to networking cabinet / router.');point(groups.electrical,18.45,1.8,1.5,M.blue,'Living room TV LAN','CAT6 data point and optional HDMI conduit.');point(groups.electrical,4.5,9.4,5,M.yellow,'Office ceiling light','LED panel or suspended ceiling light.');point(groups.electrical,14.5,9.4,5,M.yellow,'Living room ceiling light','Central dimmable LED fixture.');point(groups.electrical,22.5,9.4,5,M.yellow,'Bathroom sealed light','Moisture rated lighting fixture.');point(groups.electrical,25,8.4,5,M.blue,'Bathroom exhaust','High-level exhaust to outdoors.');point(groups.electrical,7.5,8.2,0.2,M.blue,'Office AC supply','Dedicated AC power provision subject to electrician sizing.');point(groups.electrical,16,8.2,.2,M.blue,'Living AC supply','Optional wall split AC point.');
-for(let [x,y,z,title,desc] of [[21.15,1.6,2.8,'Basin plumbing','Hot/cold supply and waste trap.'],[23.7,.3,3,'WC soil pipe','Connect to nearby soil stack only after confirming routing and slopes.'],[23.3,.25,7.5,'Shower floor drain','Trapped floor drain and waterproofed slope.'],[24.5,4.5,7.5,'Shower mixer','Protected hot and cold water lines.'],[24.5,8.1,6.9,'Geyser provision','If electric, fit outside direct splash zones with RCD protection and appropriate earthing.']])point(groups.plumbing,x,y,z,M.green,title,desc);
-label('HOME OFFICE · 9 × 10',4.5,1,5);label('LIVING · 11 × 10',14.5,1,5);label('BATH · 5 × 7',22.5,1,5);
-const target={exterior:[[33,22,32],[11,4.8,5]],cutaway:[[27,24,31],[12,1.9,5]],top:[[12.5,38,11],[12.5,0,5]],office:[[5,13,19],[4,2.8,4]],living:[[19,14,20],[14.5,2,5]],bath:[[30,14,18],[22.5,2,5]]};function setView(v){const [pos,t]=target[v];camera.position.set(...pos);orbit.target.set(...t);if(v==='exterior'){document.querySelector('#roof').checked=true;groups.roof.visible=true;groups.walls.visible=true}else{document.querySelector('#roof').checked=false;groups.roof.visible=false;groups.walls.visible=(v!=='top');}for(const b of document.querySelectorAll('[data-view]'))b.classList.toggle('selected',b.dataset.view===v);orbit.update();}setView('cutaway');document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));for(const [id,g] of [['roof',groups.roof],['walls',groups.walls],['furniture',groups.furniture],['electrical',groups.electrical],['plumbing',groups.plumbing],['labels',groups.labels],['tank',groups.tank]])document.getElementById(id).onchange=e=>g.visible=e.target.checked;
-const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();let pressed;renderer.domElement.addEventListener('pointerdown',e=>pressed={x:e.clientX,y:e.clientY});renderer.domElement.addEventListener('pointerup',e=>{if(!pressed||Math.hypot(e.clientX-pressed.x,e.clientY-pressed.y)>10)return;mouse.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(interact.filter(o=>o.visible&&o.parent.visible),false);if(hits.length){const d=hits[0].object.userData;document.querySelector('#selection').innerHTML='<span class="chip">SELECTED</span><strong></strong><div></div>';document.querySelector('#selection strong').textContent=d.name;document.querySelector('#selection div').textContent=d.desc;}});
-const menu=document.getElementById('menu'),panel=document.getElementById('panel');menu.onclick=()=>{panel.classList.toggle('open');menu.setAttribute('aria-expanded',panel.classList.contains('open'))};document.getElementById('loader').classList.add('hidden');addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});function animate(){requestAnimationFrame(animate);orbit.update();renderer.render(scene,camera)}animate();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rooftop Studio · 3D Renovation Concept</title>
+<meta name="description" content="Interactive 3D concept of a rooftop home office, living room and separately accessible bathroom.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ebe7e0; --ink:#1d2126; --muted:#6a6f77; --line:#d9d4cb;
+  --panel:rgba(255,255,255,.86); --chip:#f3f0ea; --accent:#c8612a; --accent-ink:#fff;
+  --switch:#f2b632; --socket:#e2554f; --data:#3a8de0; --hvac:#8a63d2; --light:#f6d26b; --water:#21a67a;
+  --r:14px; --shadow:0 10px 30px rgba(40,32,20,.12), 0 1px 2px rgba(40,32,20,.08);
+  font:14px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;-webkit-tap-highlight-color:transparent}
+#scene{position:fixed;inset:0}
+canvas{display:block;touch-action:none}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible+.sw{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+header{position:absolute;top:18px;left:20px;pointer-events:none;max-width:calc(100% - 40px)}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{margin:2px 0 8px;font-size:24px;font-weight:700;letter-spacing:-.02em}
+.stats{display:flex;flex-wrap:wrap;gap:6px}
+.stats span{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.stats b{color:var(--ink);font-weight:600}
+
+/* view switcher */
+#views{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:2px;padding:4px;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow);max-width:calc(100% - 24px);overflow-x:auto;scrollbar-width:none}
+#views::-webkit-scrollbar{display:none}
+#views button{border:0;background:transparent;border-radius:999px;padding:8px 15px;font-weight:500;white-space:nowrap;color:var(--muted);transition:background .2s,color .2s}
+#views button:hover{color:var(--ink)}
+#views button[aria-pressed=true]{background:var(--ink);color:#fff}
+
+/* layers panel */
+#panel{position:absolute;top:18px;right:18px;width:268px;max-height:calc(100% - 110px);overflow:auto;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 14px 12px}
+#panel h2{margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px;padding:7px 2px;cursor:pointer;user-select:none}
+.row input{position:absolute;opacity:0;pointer-events:none}
+.row .lbl{flex:1}
+.sw{width:30px;height:18px;border-radius:999px;background:#cfc9bf;position:relative;transition:background .2s;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px #0003;transition:transform .2s}
+.row input:checked+.sw{background:var(--accent)}
+.row input:checked+.sw::after{transform:translateX(12px)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;margin:0 0 6px 40px;font-size:11.5px;color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:0}
+hr{border:0;border-top:1px solid var(--line);margin:8px 0}
+details{font-size:12.5px;color:var(--muted)}
+summary{cursor:pointer;font-weight:600;color:var(--ink);padding:4px 2px;list-style:none}
+summary::after{content:"＋";float:right;color:var(--muted)}
+details[open] summary::after{content:"－"}
+details ul{margin:6px 0 4px;padding-left:18px}
+details li{margin:3px 0}
+.fine{font-size:11px;color:var(--muted);margin:10px 2px 0}
+#layersBtn,#closePanel{display:none}
+
+/* selection card */
+#card{position:absolute;left:20px;bottom:22px;width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:13px 14px 14px;transform:translateY(8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#card.show{opacity:1;transform:none;pointer-events:auto}
+#card .cat{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#card h3{margin:4px 0 4px;font-size:16px;letter-spacing:-.01em}
+#card p{margin:0;color:#41464d;font-size:13px}
+#card button{position:absolute;top:8px;right:8px;border:0;background:transparent;width:28px;height:28px;border-radius:8px;color:var(--muted);font-size:18px;line-height:1}
+#card button:hover{background:var(--chip)}
+#hint{position:absolute;left:20px;bottom:30px;font-size:12px;color:var(--muted);pointer-events:none;transition:opacity .4s}
+
+/* room labels */
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.room{position:absolute;transform:translate(-50%,-50%);background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:11.5px;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.room small{font-weight:500;color:var(--muted);margin-left:5px}
+
+#loader{position:absolute;inset:0;display:grid;place-items:center;background:var(--bg);color:var(--muted);z-index:10;transition:opacity .4s}
+#loader.done{opacity:0;pointer-events:none}
+
+@media (max-width:760px){
+  header{top:12px;left:14px}
+  h1{font-size:19px;margin-bottom:6px}
+  .stats span{font-size:11px;padding:2px 8px}
+  #layersBtn{display:block;position:absolute;top:12px;right:12px;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;padding:7px 13px;font-weight:600;font-size:13px;box-shadow:var(--shadow)}
+  #panel{display:none;top:auto;left:10px;right:10px;bottom:10px;width:auto;max-height:70vh;z-index:5;background:#fff;padding-top:12px}
+  #panel.open{display:block}
+  #closePanel{display:block;position:absolute;top:8px;right:8px;border:0;background:var(--chip);border-radius:999px;width:30px;height:30px}
+  #views{bottom:calc(14px + env(safe-area-inset-bottom));left:12px;right:12px;transform:none;max-width:none}
+  #card{left:12px;right:12px;width:auto;bottom:calc(70px + env(safe-area-inset-bottom))}
+  #hint{left:0;right:0;text-align:center;bottom:calc(74px + env(safe-area-inset-bottom))}
+  .stats span:nth-child(4){display:none}
+}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div id="labels"></div>
+<div id="loader">Loading 3D model…</div>
+
+<header>
+  <div class="eyebrow">Renovation concept</div>
+  <h1>Rooftop Studio</h1>
+  <div class="stats">
+    <span>Office <b>9 × 10 ft</b></span>
+    <span>Living <b>11 × 10 ft</b></span>
+    <span>Bath <b>5 × 7 ft</b></span>
+    <span>Walls <b>10 ft</b></span>
+  </div>
+</header>
+
+<button id="layersBtn" aria-controls="panel" aria-expanded="false">Layers</button>
+
+<aside id="panel" aria-label="Layers">
+  <button id="closePanel" aria-label="Close layers">✕</button>
+  <h2>Layers</h2>
+  <label class="row"><span class="lbl">Roof</span><input type="checkbox" data-layer="roof"><span class="sw"></span></label>
+  <label class="row"><span class="lbl">Walls, doors &amp; windows</span><input type="checkbox" data-layer="walls" checked><span class="sw"></span></label>
+  <label class="row"><span class="lbl">Cut walls at 4.5 ft</span><input type="checkbox" id="cut" checked><span class="sw"></span></label>
+  <label class="row"><span class="lbl">Furniture &amp; fixtures</span><input type="checkbox" data-layer="furniture" checked><span class="sw"></span></label>
+  <label class="row"><span class="lbl">Electrical &amp; data</span><input type="checkbox" data-layer="electrical" checked><span class="sw"></span></label>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--switch)"></i>Switch</span>
+    <span><i class="dot" style="background:var(--socket)"></i>Socket</span>
+    <span><i class="dot" style="background:var(--data)"></i>CAT6</span>
+    <span><i class="dot" style="background:var(--hvac)"></i>AC / fan</span>
+    <span><i class="dot" style="background:var(--light)"></i>Light</span>
+  </div>
+  <label class="row"><span class="lbl">Plumbing &amp; drainage</span><input type="checkbox" data-layer="plumbing" checked><span class="sw"></span></label>
+  <label class="row"><span class="lbl">Water tank (proposed)</span><input type="checkbox" data-layer="tank" checked><span class="sw"></span></label>
+  <label class="row"><span class="lbl">Room labels</span><input type="checkbox" id="labelsToggle" checked><span class="sw"></span></label>
+  <hr>
+  <details>
+    <summary>Assumptions</summary>
+    <ul>
+      <li>Existing rooftop room is demolished; existing staircase entry is kept.</li>
+      <li>Office and living each have their own door to the walkway.</li>
+      <li>The bathroom opens onto a covered nook off the walkway, never through a room.</li>
+      <li>Roof: 75 mm EPS sandwich panels — gable over the rooms, mono-pitch over the bath draining to the back.</li>
+      <li>Tank position is provisional and needs a structural engineer's sign-off.</li>
+    </ul>
+  </details>
+  <p class="fine">Concept only — not a measured survey or permit drawing. Verify dimensions, slab loading, waterproofing and service routes on site.</p>
+</aside>
+
+<nav id="views" aria-label="Camera views">
+  <button data-view="exterior">Exterior</button>
+  <button data-view="dollhouse">Dollhouse</button>
+  <button data-view="plan">Plan</button>
+  <button data-view="office">Office</button>
+  <button data-view="living">Living</button>
+  <button data-view="bath">Bath</button>
+</nav>
+
+<div id="hint">Drag to orbit · scroll or pinch to zoom · tap anything for details</div>
+<div id="card" role="status" aria-live="polite"><button aria-label="Close details">×</button><span class="cat"></span><h3></h3><p></p></div>
+
+<script>
+// If the 3D engine can't load (offline, CDN blocked), say so instead of hanging on the loader.
+setTimeout(() => { const l = document.getElementById('loader'); if (l && !l.classList.contains('done')) l.textContent = 'Could not load the 3D engine — check your connection and reload.'; }, 12000);
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ------------------------------------------------------------------
+   Units: 1 unit = 1 ft. Origin = back-left corner of the office.
+   +x runs office → living → bath. +z is the front (walkway side).
+   Wall centre-lines: office x 0–9, living x 9–20, bath x 20–25 (z 1.5–8.5).
+   Rooms z 0–10. Walkway z 10–14. Floor at y = 0.
+------------------------------------------------------------------- */
+const H = 10, T = 0.4, CUT = 4.5;
+const isSmall = matchMedia('(max-width:760px)').matches;
+
+// ---------- renderer / scene ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.localClippingEnabled = true;
+document.getElementById('scene').appendChild(renderer.domElement);
+
+const BG = new THREE.Color('#ebe7e0');
+const scene = new THREE.Scene();
+scene.background = BG;
+scene.fog = new THREE.Fog(BG, 70, 150);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.PerspectiveCamera(isSmall ? 50 : 40, innerWidth / innerHeight, 0.5, 400);
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.dampingFactor = 0.08;
+orbit.maxPolarAngle = Math.PI * 0.495;
+orbit.minDistance = 6;
+orbit.maxDistance = 110;
+
+scene.add(new THREE.HemisphereLight(0xfff7ec, 0xb9b1a4, 0.9));
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.6);
+sun.position.set(-18, 34, 26);
+sun.target.position.set(12.5, 0, 5);
+sun.castShadow = true;
+sun.shadow.mapSize.setScalar(isSmall ? 1024 : 2048);
+Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 26, bottom: -26, near: 5, far: 90 });
+sun.shadow.bias = -0.0004;
+sun.shadow.normalBias = 0.04;
+scene.add(sun, sun.target);
+
+// ---------- procedural textures ----------
+function canvasTex(size, draw, rx = 1, ry = 1) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  draw(c.getContext('2d'), size);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+const rnd = (a, b) => a + Math.random() * (b - a);
+const woodTex = canvasTex(512, (g, s) => {
+  const rows = 8, h = s / rows;
+  for (let r = 0; r < rows; r++) {
+    let x = -rnd(0, s);
+    while (x < s) {
+      const w = rnd(s * .45, s * .9), l = rnd(52, 62);
+      g.fillStyle = `hsl(31 38% ${l}%)`; g.fillRect(x, r * h, w, h);
+      g.strokeStyle = 'rgba(80,50,25,.10)';
+      for (let i = 0; i < 6; i++) { g.beginPath(); const y = r * h + rnd(3, h - 3); g.moveTo(x, y); g.bezierCurveTo(x + w * .3, y + rnd(-3, 3), x + w * .6, y + rnd(-3, 3), x + w, y); g.stroke(); }
+      g.fillStyle = 'rgba(60,35,15,.35)'; g.fillRect(x, r * h, 1.5, h);
+      x += w;
+    }
+    g.fillStyle = 'rgba(60,35,15,.3)'; g.fillRect(0, r * h, s, 1.5);
+  }
+}, 2.5, 2.5);
+const tileTex = canvasTex(256, (g, s) => {
+  g.fillStyle = '#d9d6cf'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(${Math.random() < .5 ? '90,90,90' : '255,255,255'},${rnd(.05, .18)})`; g.fillRect(rnd(0, s), rnd(0, s), rnd(1, 3), rnd(1, 3)); }
+  g.strokeStyle = '#b9b4aa'; g.lineWidth = 3; g.strokeRect(0, 0, s, s);
+}, 3.5, 3.5);
+const deckTex = canvasTex(256, (g, s) => {
+  g.fillStyle = '#c9c3b8'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 1400; i++) { g.fillStyle = `rgba(70,65,60,${rnd(.03, .12)})`; g.fillRect(rnd(0, s), rnd(0, s), 2, 2); }
+  g.strokeStyle = '#aaa398'; g.lineWidth = 4; g.strokeRect(0, 0, s, s);
+}, 1, 1);
+const concreteTex = canvasTex(256, (g, s) => {
+  g.fillStyle = '#b8b3aa'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 2500; i++) { g.fillStyle = `rgba(${Math.random() < .5 ? '60,60,60' : '255,255,255'},${rnd(.03, .1)})`; g.fillRect(rnd(0, s), rnd(0, s), rnd(1, 4), rnd(1, 4)); }
+}, 4, 4);
+const seamTex = canvasTex(256, (g, s) => {
+  g.fillStyle = '#4a5560'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 4; i++) { g.fillStyle = '#5d6975'; g.fillRect(i * s / 4, 0, 6, s); g.fillStyle = '#39424b'; g.fillRect(i * s / 4 + 6, 0, 2, s); }
+}, 6, 1);
+const rugTex = canvasTex(256, (g, s) => {
+  g.fillStyle = '#d8cfbf'; g.fillRect(0, 0, s, s);
+  g.strokeStyle = '#b6a78f'; g.lineWidth = 10; g.strokeRect(14, 14, s - 28, s - 28);
+  g.lineWidth = 3; g.strokeRect(34, 34, s - 68, s - 68);
+});
+const tex = (base, rx, ry) => { const t = base.clone(); t.needsUpdate = true; t.repeat.set(rx, ry); return t; };
+
+// ---------- materials ----------
+const cutPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1000);
+const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: .85, metalness: 0, ...o });
+const clip = m => Object.assign(m, { clippingPlanes: [cutPlane], clipShadows: true, side: THREE.DoubleSide });
+const M = {
+  wall: std('#f3efe8', { roughness: .95 }),
+  cap: std('#3b4047', { roughness: .9 }),
+  slab: std('#ffffff', { map: concreteTex, roughness: .95 }),
+  building: std('#d8d2c8', { roughness: 1 }),
+  parapet: std('#e4dfd6', { roughness: .95 }),
+  frame: clip(std('#2d3238', { metalness: .4, roughness: .45 })),
+  glass: clip(new THREE.MeshPhysicalMaterial({ color: '#a9cfe0', roughness: .05, metalness: 0, transmission: 0, transparent: true, opacity: .35, depthWrite: false })),
+  door: clip(std('#8a6446', { roughness: .7 })),
+  doorBath: clip(std('#5f7d7a', { roughness: .7 })),
+  roof: std('#ffffff', { map: seamTex, metalness: .35, roughness: .45 }),
+  roofEdge: std('#2f363d', { metalness: .4, roughness: .5 }),
+  oak: std('#c49a6c', { roughness: .6 }),
+  walnut: std('#6b4a35', { roughness: .6 }),
+  black: std('#24282d', { roughness: .5 }),
+  screen: std('#0f1216', { roughness: .2, metalness: .2 }),
+  steel: std('#9aa3ab', { metalness: .8, roughness: .3 }),
+  fabric: std('#7b8a8f', { roughness: 1 }),
+  fabric2: std('#c56b47', { roughness: 1 }),
+  cushion: std('#e7dccb', { roughness: 1 }),
+  ceramic: std('#fbfbf8', { roughness: .25 }),
+  bathGlass: clip(new THREE.MeshPhysicalMaterial({ color: '#cfe6ee', roughness: .05, transparent: true, opacity: .3, depthWrite: false })),
+  mirror: clip(std('#d9e3e8', { metalness: 1, roughness: .05 })),
+  fitting: clip(std('#9aa3ab', { metalness: .8, roughness: .3 })),
+  leaf: std('#5e8a4f', { roughness: .9, flatShading: true }),
+  pot: std('#b5654a', { roughness: .8 }),
+  tank: std('#2f3c48', { roughness: .55 }),
+  acUnit: std('#f7f7f5', { roughness: .4 }),
+};
+const floorMat = (base, w, d) => std('#ffffff', { map: tex(base, w / 4, d / 4), roughness: .7 });
+
+// ---------- groups ----------
+const G = {};
+for (const k of ['site', 'walls', 'roof', 'furniture', 'electrical', 'plumbing', 'tank']) { G[k] = new THREE.Group(); scene.add(G[k]); }
+const wallPieces = new THREE.Group(), upper = new THREE.Group(), openings = new THREE.Group();
+G.walls.add(wallPieces, upper, openings);
+
+// ---------- helpers ----------
+/** Axis-aligned box from min/max corners. */
+function B(parent, x0, x1, y0, y1, z0, z1, mat, opts = {}) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat);
+  m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  m.castShadow = opts.cast ?? true; m.receiveShadow = true;
+  parent.add(m); return m;
+}
+function C(parent, x, y0, y1, z, r, mat, seg = 28, r2 = r) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r2, y1 - y0, seg), mat);
+  m.position.set(x, (y0 + y1) / 2, z); m.castShadow = m.receiveShadow = true;
+  parent.add(m); return m;
+}
+/** A named, clickable compound object. */
+function item(parent, name, cat, desc) {
+  const g = new THREE.Group(); g.userData.info = { name, cat, desc }; parent.add(g); return g;
+}
+
+// ---------- site: building below, slab, walkway, parapet, railing ----------
+const SX0 = -2, SX1 = 27, SZ0 = -3.2, SZ1 = 14;
+B(G.site, SX0 - .3, SX1 + .3, -34, -0.8, SZ0 - .3, SZ1 + .3, M.building);
+const slab = item(G.site, 'Existing RCC roof slab', 'Structure', 'Existing slab, shown schematically. Its load capacity — especially under the new walls and the water tank — must be checked by a structural engineer.');
+B(slab, SX0, SX1, -0.8, 0, SZ0, SZ1, M.slab);
+const walk = item(G.site, 'Common walkway', 'Circulation', 'Open-air walkway along the front, reached from the existing staircase. All three doors open onto it.');
+B(walk, SX0, SX1, 0, .05, 10, SZ1, floorMat(deckTex, SX1 - SX0, SZ1 - 10), { cast: false });
+// parapet: back + both sides (3 ft)
+const par = item(G.site, 'Parapet wall', 'Structure', '3 ft parapet on the back and sides. Front edge has a steel railing.');
+B(par, SX0, SX1, 0, 3, SZ0, SZ0 + .5, M.parapet);
+B(par, SX0, SX0 + .5, 0, 3, SZ0, SZ1, M.parapet);
+B(par, SX1 - .5, SX1, 0, 3, SZ0, SZ1, M.parapet);
+// railing on the front edge
+const rail = item(G.site, 'Front railing', 'Safety', '3.5 ft steel railing on the open edge of the walkway.');
+for (let x = SX0 + .7; x <= SX1 - .5; x += 2.2) B(rail, x - .06, x + .06, 0, 3.5, SZ1 - .3, SZ1 - .18, M.black);
+B(rail, SX0 + .5, SX1 - .5, 3.42, 3.56, SZ1 - .34, SZ1 - .14, M.black);
+B(rail, SX0 + .5, SX1 - .5, 1.75, 1.82, SZ1 - .27, SZ1 - .21, M.black);
+// potted plants on the walkway
+function plant(parent, x, z, s = 1) {
+  C(parent, x, .05, .05 + 1.3 * s, z, .55 * s, M.pot, 20, .42 * s);
+  for (let i = 0; i < 4; i++) {
+    const l = new THREE.Mesh(new THREE.IcosahedronGeometry(rnd(.55, .8) * s, 0), M.leaf);
+    l.position.set(x + rnd(-.35, .35) * s, (1.3 + rnd(.5, 1.4)) * s, z + rnd(-.35, .35) * s);
+    l.castShadow = true; parent.add(l);
+  }
+}
+plant(G.site, -.6, 12.6, 1.1); plant(G.site, 25.8, 12.6, 1.1); plant(G.site, 8.2, 12.9, .8);
+
+// ---------- floors ----------
+const fl = item(G.furniture, 'Engineered wood floor', 'Finish', 'Warm wood-look flooring runs through office and living.');
+B(fl, 0, 20, 0, .06, 0, 10, floorMat(woodTex, 20, 10), { cast: false });
+const bf = item(G.furniture, 'Bathroom floor', 'Finish', 'Anti-slip tile with a waterproof membrane, sloped to the floor drain. Turned up the walls at least 6 in.');
+B(bf, 20, 25, 0, .07, 1.5, 8.5, floorMat(tileTex, 5, 7), { cast: false });
+B(bf, 20, 25, 0, .055, 8.5, 10, floorMat(tileTex, 5, 1.5), { cast: false });
+
+// ---------- walls (rebuilt when the cut toggles) ----------
+const pieces = []; // {x0,x1,z0,z1,y0,y1}
+const high = []; // ceiling / high-wall items hidden while walls are cut
+/** Wall run along x or z with openings [{a,b,y0,y1}] (a,b in world coords along the run). */
+function run(axis, fixed, from, to, ops = [], ext = [T / 2, T / 2]) {
+  const s = from - ext[0], e = to + ext[1];
+  const push = (a, b, y0, y1) => axis === 'x'
+    ? pieces.push({ x0: a, x1: b, z0: fixed - T / 2, z1: fixed + T / 2, y0, y1 })
+    : pieces.push({ x0: fixed - T / 2, x1: fixed + T / 2, z0: a, z1: b, y0, y1 });
+  let c = s;
+  for (const o of [...ops].sort((p, q) => p.a - q.a)) {
+    if (o.a > c) push(c, o.a, 0, H);
+    if (o.y0 > 0) push(o.a, o.b, 0, o.y0);
+    if (o.y1 < H) push(o.a, o.b, o.y1, H);
+    c = o.b;
+  }
+  if (e > c) push(c, e, 0, H);
+}
+const DOOR = 7, SILL = 3, HEAD = 7.5;
+const O = {
+  officeDoor: { a: 1.2, b: 4.2, y0: 0, y1: DOOR },
+  officeFront: { a: 5.6, b: 8.2, y0: SILL, y1: HEAD },
+  officeSide: { a: 3, b: 7, y0: SILL, y1: HEAD },
+  livingFront: { a: 9.9, b: 12.7, y0: SILL, y1: HEAD },
+  livingDoor: { a: 13.5, b: 16.5, y0: 0, y1: DOOR },
+  livingBack: { a: 12.5, b: 16.5, y0: SILL, y1: HEAD },
+  bathDoor: { a: 20.6, b: 22.9, y0: 0, y1: DOOR },
+  bathVent: { a: 6, b: 7.5, y0: 7.5, y1: 9 },
+};
+run('x', 0, 0, 20, [O.livingBack]);                            // back wall
+run('x', 10, 0, 20, [O.officeDoor, O.officeFront, O.livingFront, O.livingDoor]); // front wall
+run('z', 0, 0, 10, [O.officeSide], [-T / 2, -T / 2]);          // office west
+run('z', 9, 0, 10, [], [-T / 2, -T / 2]);                      // partition
+run('z', 20, 0, 10, [], [-T / 2, -T / 2]);                     // living | bath — full height, no gap
+run('x', 1.5, 20, 25, [], [-T / 2, T / 2]);                    // bath back
+run('x', 8.5, 20, 25, [O.bathDoor], [-T / 2, T / 2]);          // bath front with its own door
+run('z', 25, 1.5, 8.5, [O.bathVent], [-T / 2, -T / 2]);        // bath east
+
+const capMats = [M.wall, M.wall, M.cap, M.wall, M.wall, M.wall];
+function buildWalls(cut) {
+  wallPieces.clear();
+  const top = cut ? CUT : Infinity;
+  for (const p of pieces) {
+    const y1 = Math.min(p.y1, top);
+    if (y1 <= p.y0 + .01) continue;
+    const m = B(wallPieces, p.x0, p.x1, p.y0, y1, p.z0, p.z1, y1 < p.y1 ? capMats : M.wall);
+    m.userData.info = { name: 'Wall', cat: 'Structure', desc: 'Lightweight infill wall, ~5 in. Confirm the system (AAC block, light-gauge steel + board, or half-brick) against slab capacity.' };
+  }
+  upper.visible = !cut;
+  for (const o of high) o.visible = !cut;
+  cutPlane.constant = cut ? CUT : 1000;
+}
+
+// gable infills above the walls at x = 0 and x = 20 (roof ridge along x)
+function triPrism(parent, xFace, pts, mat) {
+  const sh = new THREE.Shape(pts.map(([z, y]) => new THREE.Vector2(z, y)));
+  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false }), mat);
+  m.rotation.y = -Math.PI / 2; m.position.x = xFace + T / 2;
+  m.castShadow = m.receiveShadow = true; parent.add(m); return m;
+}
+for (const x of [0, 20]) triPrism(upper, x, [[-T / 2, H], [10 + T / 2, H], [5, 12.6]], M.wall);
+// bath roof is a 1:12 mono-pitch rising toward the front; fill the wedge above its walls
+const BP = 1 / 12, bathRoofY = z => H + (z - 1.5) * BP;
+triPrism(upper, 25, [[1.5 - T / 2, H], [8.5 + T / 2, H], [8.5 + T / 2, bathRoofY(8.7)]], M.wall);
+B(upper, 20.2, 25.2, H, bathRoofY(8.3), 8.3, 8.7, M.wall);
+
+// ---------- doors & windows ----------
+function doorway(name, cat, desc, x0, x1, zWall, hingeAtX0, mat, open = 0.55) {
+  const g = item(openings, name, cat, desc);
+  const fz0 = zWall - T / 2 - .04, fz1 = zWall + T / 2 + .04;
+  B(g, x0, x0 + .15, 0, DOOR, fz0, fz1, M.frame); B(g, x1 - .15, x1, 0, DOOR, fz0, fz1, M.frame);
+  B(g, x0, x1, DOOR - .15, DOOR, fz0, fz1, M.frame);
+  const w = x1 - x0 - .3, pivot = new THREE.Group();
+  pivot.position.set(hingeAtX0 ? x0 + .15 : x1 - .15, 0, zWall - T / 2 + .08);
+  pivot.rotation.y = (hingeAtX0 ? 1 : -1) * open; // swings inward (−z)
+  g.add(pivot);
+  const leaf = B(pivot, hingeAtX0 ? 0 : -w, hingeAtX0 ? w : 0, .05, DOOR - .17, -.08, .08, mat);
+  const handleX = hingeAtX0 ? w - .35 : -w + .35;
+  B(pivot, handleX - .2, handleX + .2, 3.3, 3.42, -.18, .18, M.steel);
+  return leaf;
+}
+doorway('Office door', 'Door', '3 ft weather-sealed external door straight off the walkway.', O.officeDoor.a, O.officeDoor.b, 10, true, M.door);
+doorway('Living room door', 'Door', '3 ft external door. Independent of the office, so either room can be used alone.', O.livingDoor.a, O.livingDoor.b, 10, false, M.door);
+doorway('Bathroom door', 'Door', '2 ft 3 in door opening onto a covered nook off the walkway — the bath is reachable without passing through either room.', O.bathDoor.a, O.bathDoor.b, 8.5, true, M.doorBath, .7);
+
+function windowIn(name, desc, axis, fixed, o) {
+  const g = item(openings, name, 'Window', desc), f = .14, d0 = fixed - T / 2 - .03, d1 = fixed + T / 2 + .03;
+  const add = (a0, a1, y0, y1, mat, thin) => axis === 'x'
+    ? B(g, a0, a1, y0, y1, thin ? fixed - .02 : d0, thin ? fixed + .02 : d1, mat, { cast: !thin })
+    : B(g, thin ? fixed - .02 : d0, thin ? fixed + .02 : d1, y0, y1, a0, a1, mat, { cast: !thin });
+  add(o.a, o.b, o.y0, o.y0 + f, M.frame); add(o.a, o.b, o.y1 - f, o.y1, M.frame);
+  add(o.a, o.a + f, o.y0, o.y1, M.frame); add(o.b - f, o.b, o.y0, o.y1, M.frame);
+  if (o.b - o.a > 2.5) { const m = (o.a + o.b) / 2; add(m - .05, m + .05, o.y0, o.y1, M.frame); }
+  add(o.a + f, o.b - f, o.y0 + f, o.y1 - f, M.glass, true);
+}
+windowIn('Office side window', 'West-facing 4 ft window for cross-ventilation with the front window.', 'z', 0, O.officeSide);
+windowIn('Office front window', 'Daylight for the desk zone without screen glare from behind.', 'x', 10, O.officeFront);
+windowIn('Living front window', 'Looks onto the walkway; pairs with the back window for through-breeze.', 'x', 10, O.livingFront);
+windowIn('Living back window', '4 ft window on the back wall, centred on the room.', 'x', 0, O.livingBack);
+windowIn('Bathroom ventilator', 'High-level obscured glass with an exhaust fan beside it.', 'z', 25, O.bathVent);
+
+// ---------- roof ----------
+const RP = .5, RA = Math.atan(RP), RT = .25;
+function slope(parent, xa, xb, zLow, zHigh, yLowSurface, a, mat) {
+  // board lying on a plane through (zLow, yLowSurface) rising toward zHigh
+  const dir = Math.sign(zHigh - zLow), horiz = Math.abs(zHigh - zLow), len = horiz / Math.cos(a);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(xb - xa, RT, len), mat);
+  const zc = (zLow + zHigh) / 2, yc = yLowSurface + horiz / 2 * Math.tan(a);
+  m.rotation.x = -dir * a;
+  m.position.set((xa + xb) / 2, yc + RT / 2 * Math.cos(a), zc - dir * RT / 2 * Math.sin(a));
+  m.castShadow = m.receiveShadow = true; parent.add(m); return m;
+}
+const roofMain = item(G.roof, 'Gable roof — office & living', 'Roof', '75 mm EPS sandwich panels, ridge along the length, 0.9 ft eaves. Ridge cap, flashing to the gables and fixings need detailing.');
+const ov = .9, eaveY = H - ov * RP;
+slope(roofMain, -.8, 20.2, -ov, 5, eaveY, RA, M.roof);
+slope(roofMain, -.8, 20.2, 10 + ov, 5, eaveY, RA, M.roof);
+const ridge = new THREE.Mesh(new THREE.BoxGeometry(21, .3, .7), M.roofEdge);
+ridge.position.set(9.7, 12.5 + RT + .05, 5); ridge.castShadow = true; roofMain.add(ridge);
+const roofBath = item(G.roof, 'Mono-pitch roof — bath', 'Roof', 'Separate 1:12 EPS panel roof draining to the back, away from the door. Overhangs the entry nook so you stay dry going in.');
+slope(roofBath, 20.2, 25.6, .9, 10.4, bathRoofY(.9), Math.atan(BP), M.roof);
+
+// ---------- furniture: office ----------
+const F = G.furniture;
+{
+  const desk = item(F, 'Desk', 'Office', '6 ft × 2.5 ft desk on the back wall with a cable tray underneath. Power and two CAT6 ports sit right behind it.');
+  B(desk, 1, 7.2, 2.4, 2.55, .25, 2.75, M.oak);
+  for (const x of [1.15, 7.05]) B(desk, x - .1, x + .1, .06, 2.4, .4, 2.6, M.black);
+  B(desk, 1.2, 7, 1.9, 2.0, .3, .9, M.black);
+  const mon = item(F, 'Dual monitors', 'Office', 'Arm-mounted so the desk stays clear.');
+  for (const x of [3.05, 5.15]) { B(mon, x - 1, x + 1, 3.25, 4.45, .9, 1.0, M.screen); }
+  B(mon, 4.05, 4.15, 2.55, 4, .5, .6, M.steel);
+  B(desk, 3.3, 4.8, 2.56, 2.6, 1.6, 2.1, M.black);
+  const chair = item(F, 'Task chair', 'Office', 'Ergonomic chair with ~3 ft of clearance behind the desk.');
+  C(chair, 4.1, .06, 1.6, 3.7, .08, M.steel, 12);
+  C(chair, 4.1, .06, .25, 3.7, .9, M.black, 5, .9);
+  B(chair, 3.25, 4.95, 1.55, 1.85, 2.95, 4.5, M.black);
+  B(chair, 3.3, 4.9, 2.0, 4.3, 4.45, 4.7, M.black);
+  const shelf = item(F, 'Bookshelf', 'Office', 'Full-height open shelving on the partition wall, 10 in deep.');
+  B(shelf, 8.0, 8.8, .06, 6.6, 3.4, 3.5, M.walnut); B(shelf, 8.0, 8.8, .06, 6.6, 7.4, 7.5, M.walnut);
+  for (const y of [.1, 1.6, 3.1, 4.6, 6.5]) B(shelf, 8.0, 8.8, y, y + .1, 3.4, 7.5, M.walnut);
+  for (const y of [.2, 1.7, 3.2, 4.7]) for (let z = 3.6; z < 7.2; z += rnd(.25, .6)) B(shelf, 8.2, 8.75, y, y + rnd(.8, 1.2), z, z + rnd(.12, .25), [M.fabric2, M.fabric, M.cushion, M.black][Math.floor(rnd(0, 4))]);
+  const rc = item(F, 'Reading chair + lamp', 'Office', 'A second seat for calls and reading, by the front window.');
+  B(rc, 6.4, 8.4, .5, 1.5, 7.9, 9.5, M.fabric2); B(rc, 6.4, 8.4, 1.5, 3.2, 9.2, 9.6, M.fabric2);
+  B(rc, 6.3, 6.6, .5, 2.2, 7.9, 9.6, M.fabric2); B(rc, 8.2, 8.5, .5, 2.2, 7.9, 9.6, M.fabric2);
+  for (const [x, z] of [[6.45, 8.0], [8.35, 8.0], [6.45, 9.5], [8.35, 9.5]]) B(rc, x - .05, x + .05, .06, .5, z - .05, z + .05, M.black);
+  C(rc, 5.6, .06, 5.2, 9.2, .04, M.black, 8); C(rc, 5.6, 5.0, 5.9, 9.2, .45, M.cushion, 20, .6);
+  const rug = item(F, 'Rug', 'Office', '');
+  B(rug, 1.6, 6.6, .06, .09, 3, 7, std('#fff', { map: rugTex }), { cast: false });
+}
+// ---------- furniture: living ----------
+{
+  const sofa = item(F, 'Sofa', 'Living', 'Three-seater against the partition, facing the TV wall ~8 ft away — a comfortable viewing distance for a 55" screen.');
+  B(sofa, 9.4, 12.2, .4, 1.5, 2, 8, M.fabric);
+  B(sofa, 9.4, 10.2, 1.5, 3.0, 2, 8, M.fabric);
+  B(sofa, 9.4, 12.2, 1.5, 2.2, 2, 2.5, M.fabric); B(sofa, 9.4, 12.2, 1.5, 2.2, 7.5, 8, M.fabric);
+  for (const [z0, z1] of [[2.5, 4.5], [4.5, 6], [6, 7.5]]) B(sofa, 10.2, 12.1, 1.5, 1.85, z0 + .03, z1 - .03, M.cushion);
+  for (const [x, z] of [[9.5, 2.1], [12.1, 2.1], [9.5, 7.9], [12.1, 7.9]]) B(sofa, x - .06, x + .06, .06, .4, z - .06, z + .06, M.black);
+  B(sofa, 10.3, 10.6, 1.8, 2.9, 2.8, 4.0, M.fabric2);
+  const ct = item(F, 'Coffee table', 'Living', 'Low oak table, leaves a clear 3 ft path from the door.');
+  B(ct, 13.2, 15.4, 1.25, 1.4, 3.7, 6.3, M.oak);
+  for (const [x, z] of [[13.35, 3.85], [15.25, 3.85], [13.35, 6.15], [15.25, 6.15]]) B(ct, x - .06, x + .06, .06, 1.25, z - .06, z + .06, M.black);
+  const tv = item(F, 'Wall-mounted TV', 'Living', '55" TV on the bath-side wall. Recessed box behind it for power, CAT6 and an HDMI conduit down to the console.');
+  B(tv, 19.6, 19.75, 3.4, 6.2, 2.6, 7.4, M.screen);
+  const con = item(F, 'Media console', 'Living', 'Low console with concealed power strip and router/UPS space.');
+  B(con, 18.6, 19.75, .5, 1.9, 2.8, 7.2, M.walnut);
+  for (const z of [2.95, 7.05]) B(con, 18.7, 19.65, .06, .5, z - .08, z + .08, M.black);
+  const rug = item(F, 'Rug', 'Living', '');
+  B(rug, 12.6, 18.2, .06, .09, 1.8, 8.2, std('#fff', { map: rugTex }), { cast: false });
+  const p = item(F, 'Indoor plant', 'Living', '');
+  plant(p, 19.0, 9.2, .9);
+}
+// ---------- furniture: bathroom ----------
+{
+  const wc = item(F, 'WC', 'Bathroom', 'Floor-mounted western WC on the east wall, cistern against the wall. Soil pipe routes to the nearest stack — confirm fall before finalising.');
+  B(wc, 24.25, 24.8, .07, 2.9, 5.75, 6.85, M.ceramic);
+  C(wc, 23.6, .07, 1.0, 6.3, .42, M.ceramic, 28, .32);
+  C(wc, 23.6, 1.0, 1.32, 6.3, .55, M.ceramic, 28);
+  B(wc, 23.6, 24.3, 1.0, 1.32, 5.75, 6.85, M.ceramic);
+  const bas = item(F, 'Washbasin + vanity', 'Bathroom', 'Wall-hung basin on a shallow vanity, mirror above on the same wall.');
+  B(bas, 20.2, 21.6, .6, 2.6, 4.9, 6.3, M.walnut);
+  B(bas, 20.2, 21.7, 2.6, 2.85, 4.85, 6.35, M.ceramic);
+  C(bas, 20.45, 2.85, 3.35, 5.6, .05, M.steel, 10);
+  B(bas, 20.4, 20.9, 3.3, 3.36, 5.56, 5.64, M.steel);
+  const mir = item(F, 'Mirror', 'Bathroom', 'Mirror mounted flat on the wall above the basin, with a vanity light over it.');
+  B(mir, 20.2, 20.26, 3.9, 6.4, 4.9, 6.3, M.mirror);
+  const sh = item(F, 'Shower', 'Bathroom', 'Walk-in shower at the back, 5 × 2.7 ft, with a fixed glass screen. Floor falls to a trapped drain; walls waterproofed to full height.');
+  B(sh, 20.2, 24.8, .07, .1, 1.7, 4.2, floorMat(tileTex, 4.6, 2.5), { cast: false });
+  B(sh, 22.4, 24.8, .1, 6.8, 4.22, 4.28, M.bathGlass, { cast: false });
+  B(sh, 22.4, 24.8, 6.75, 6.82, 4.2, 4.3, M.fitting);
+  C(sh, 23.6, 6.4, 6.5, 2.1, .38, M.fitting, 24);
+  B(sh, 23.55, 23.65, 6.45, 6.55, 1.7, 2.1, M.fitting);
+  B(sh, 23.5, 23.7, 6.5, 7.1, 1.7, 1.82, M.fitting);
+}
+
+// ---------- service points ----------
+const SERV = {
+  switch: { color: '#f2b632', cat: 'Switch' }, socket: { color: '#e2554f', cat: 'Power socket' },
+  data: { color: '#3a8de0', cat: 'Data' }, hvac: { color: '#8a63d2', cat: 'AC / ventilation' },
+  light: { color: '#f6d26b', cat: 'Lighting' }, water: { color: '#21a67a', cat: 'Plumbing' },
+};
+const markerGeo = new THREE.SphereGeometry(.2, 20, 14), ringGeo = new THREE.TorusGeometry(.32, .05, 8, 32);
+const markerMats = Object.fromEntries(Object.entries(SERV).map(([k, v]) => [k, std(v.color, { emissive: v.color, emissiveIntensity: .35, roughness: .4 })]));
+function point(kind, x, y, z, name, desc) {
+  const g = item(kind === 'water' ? G.plumbing : G.electrical, name, SERV[kind].cat, desc);
+  const s = new THREE.Mesh(markerGeo, markerMats[kind]); s.position.set(x, y, z); g.add(s);
+  if (kind === 'light') { const r = new THREE.Mesh(ringGeo, markerMats.light); r.rotation.x = Math.PI / 2; r.position.set(x, y, z); g.add(r); }
+  if (y > CUT + .5) high.push(g);
+  return g;
+}
+const IN = .3; // offset from wall face into the room
+// switches — on the latch side, 4 ft high
+point('switch', 4.7, 4, 10 - T / 2 - IN, 'Office switches', 'Light + fan, latch side of the door at ~4 ft (1.2 m).');
+point('switch', 13.0, 4, 10 - T / 2 - IN, 'Living switches', 'Light, fan and dimmer by the door.');
+point('switch', 23.35, 4, 8.5 - T / 2 - IN, 'Bathroom switches', 'Light + exhaust fan, inside by the door, away from the shower.');
+// sockets — 12 in high unless noted
+point('socket', 2.0, 1.2, T / 2 + IN, 'Desk power (×2)', 'Dedicated circuit for the workstation, surge-protected.');
+point('socket', 6.4, 1.2, T / 2 + IN, 'Desk power (×2)', 'Second double socket so nothing daisy-chains.');
+point('socket', T / 2 + IN, 1, 8.5, 'Office general socket', 'For the reading lamp, vacuum or a charger.');
+point('socket', 20 - T / 2 - IN, 1.2, 3.4, 'TV / console power', 'Behind the console, with space for a small UPS.');
+point('socket', 9 + T / 2 + IN, 1, 1.4, 'Sofa-side socket', 'Phone charging and a side lamp.');
+point('socket', 9 + T / 2 + IN, 1, 8.6, 'Sofa-side socket', 'Second side of the sofa.');
+point('socket', 20 - T / 2 - IN, 4.2, 8.8, 'Bathroom-side spare', 'General socket in the living room near the door.');
+point('socket', 20 + T / 2 + IN, 4.4, 7.4, 'Geyser supply', 'Fused spur + RCD for the water heater, outside the shower splash zone.');
+// data
+point('data', 4.1, 1.2, T / 2 + IN, 'Desk CAT6 (×2)', 'Two RJ45 ports home-run to the router/switch.');
+point('data', 20 - T / 2 - IN, 1.5, 5, 'TV CAT6', 'Wired data for the TV/streamer; HDMI conduit to the wall plate behind the TV.');
+// AC / ventilation
+const ac = (x, z0, z1, n) => { const g = item(G.electrical, n, 'AC / ventilation', 'Wall-split indoor unit on a dedicated circuit. Size it with the installer (~1–1.5 ton for these rooms with an insulated roof).'); B(g, x - 1.6, x + 1.6, 8.0, 9.0, z0, z1, M.acUnit); high.push(g); };
+ac(4.1, T / 2, T / 2 + .8, 'Office AC'); ac(14.5, T / 2, T / 2 + .8, 'Living AC');
+point('hvac', 25 - T / 2 - IN, 8.2, 5.2, 'Bathroom exhaust fan', 'Ducted to outside next to the ventilator window.');
+// lights (ceiling)
+point('light', 4.5, 9.6, 5, 'Office ceiling light', 'LED panel, neutral white (4000 K) for working.');
+point('light', 14.5, 9.6, 5, 'Living ceiling light', 'Dimmable warm LED (2700–3000 K).');
+point('light', 22.5, 9.6, 6.2, 'Bathroom light', 'Sealed IP44+ fitting.');
+point('light', 20 + T / 2 + IN, 6.7, 5.6, 'Vanity light', 'Above the mirror.');
+point('light', 22.5, 9.4, 9.4, 'Entry nook light', 'Outdoor-rated, lights the bath entry at night.');
+// plumbing
+point('water', 20.6, 2.2, 5.6, 'Basin supply + waste', 'Hot/cold angle valves and a bottle trap inside the vanity.');
+point('water', 24.0, .3, 6.3, 'WC soil outlet', 'Connect to the soil stack; confirm the route and fall before slab work.');
+point('water', 24.8 - IN, 1.5, 5.4, 'WC cold supply', 'Angle valve beside the cistern.');
+point('water', 23.6, .3, 3.0, 'Shower drain', 'Trapped floor drain; floor falls ~1:60 toward it.');
+point('water', 23.6, 3.8, 1.5 + T / 2 + IN, 'Shower mixer', 'Concealed thermostatic mixer, hot + cold.');
+const gy = item(G.plumbing, 'Water heater (geyser)', 'Plumbing', '15–25 L electric geyser high on the wall by the door, outside the shower zone, with RCD protection and proper earthing.');
+C(gy, 20.75, 7.3, 9.1, 7.5, .5, M.ceramic, 24); high.push(gy);
+
+// ---------- relocated tank ----------
+{
+  const st = item(G.tank, 'Tank stand (proposed)', 'Water tank', 'Steel stand behind the bath, legs landing near the parapet line. Indicative only — the slab must be checked before anything heavy goes here.');
+  for (const x of [21.2, 24.8]) for (const z of [-2.4, .6]) B(st, x - .12, x + .12, .05, 3, z - .12, z + .12, M.black);
+  B(st, 21, 25, 3, 3.25, -2.6, .8, M.black);
+  const tk = item(G.tank, 'Water tank — 1,000 L (proposed)', 'Water tank', 'A full 1,000 L tank weighs about 1 tonne. Location is provisional pending structural review; keep access for cleaning. Feeds the bath by gravity.');
+  C(tk, 23, 3.25, 7.2, -.9, 1.65, M.tank, 40, 1.75);
+  C(tk, 23, 7.2, 7.6, -.9, .7, M.tank, 32, 1.4);
+  for (const y of [4.2, 5.2, 6.2]) C(tk, 23, y, y + .12, -.9, 1.78, M.tank, 40);
+}
+
+// ---------- room labels (HTML) ----------
+const labelsEl = document.getElementById('labels');
+const ROOMS = [
+  ['Home office', '9 × 10 ft', [4.5, .3, 5.6]],
+  ['Living', '11 × 10 ft', [15.2, .3, 8.7]],
+  ['Bath', '5 × 7 ft', [21.9, .3, 7.6]],
+  ['Walkway', '', [12.5, .3, 12]],
+].map(([n, s, p]) => {
+  const el = document.createElement('div'); el.className = 'room'; el.innerHTML = `${n}${s ? `<small>${s}</small>` : ''}`;
+  labelsEl.appendChild(el); return { el, p: new THREE.Vector3(...p) };
+});
+let labelsOn = true, cutOn = true;
+const v = new THREE.Vector3();
+function placeLabels() {
+  const show = labelsOn && (cutOn || !G.walls.visible);
+  for (const r of ROOMS) {
+    v.copy(r.p).project(camera);
+    const ok = show && v.z < 1;
+    r.el.style.display = ok ? '' : 'none';
+    if (ok) r.el.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px,${(-v.y * .5 + .5) * innerHeight}px) translate(-50%,-50%)`;
+  }
+}
+labelsEl.querySelectorAll('.room').forEach(e => { e.style.left = '0'; e.style.top = '0'; });
+
+// ---------- views ----------
+const VIEWS = isSmall ? {
+  exterior: [[40, 30, 52], [12.5, 3, 5], true, false],
+  dollhouse: [[30, 33, 40], [12.5, 0, 5], false, true],
+  plan: [[12.5, 82, 5.52], [12.5, 0, 5.5], false, true],
+  office: [[4.5, 25, 26], [4.5, 1, 5], false, true],
+  living: [[15, 25, 27], [14.5, 1, 5], false, true],
+  bath: [[27, 28, 21], [22.5, 0, 5], false, true],
+} : {
+  exterior: [[36, 21, 44], [12.5, 3.5, 5], true, false],
+  dollhouse: [[31, 30, 37], [12.5, 0, 5], false, true],
+  plan: [[12.5, 52, 5.01], [12.5, 0, 5], false, true],
+  office: [[2, 21, 25], [4.5, 1, 5], false, true],
+  living: [[16, 22, 27], [14.5, 1, 5], false, true],
+  bath: [[31, 34, 25], [22.5, 0, 5], false, true],
+};
+const roofBox = document.querySelector('[data-layer=roof]'), cutBox = document.getElementById('cut');
+function setRoof(on) { G.roof.visible = roofBox.checked = on; }
+function setCut(on) { cutOn = cutBox.checked = on; buildWalls(on); }
+let tween = null;
+function setView(name, instant = false) {
+  const [p, t, roof, cut] = VIEWS[name];
+  setRoof(roof); setCut(cut);
+  document.querySelectorAll('#views button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === name));
+  const p1 = new THREE.Vector3(...p), t1 = new THREE.Vector3(...t);
+  if (instant) { camera.position.copy(p1); orbit.target.copy(t1); orbit.update(); return; }
+  tween = { p0: camera.position.clone(), t0: orbit.target.clone(), p1, t1, s: performance.now(), d: 850 };
+}
+document.querySelectorAll('#views button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+orbit.addEventListener('start', () => { tween = null; });
+
+// ---------- layer toggles ----------
+document.querySelectorAll('[data-layer]').forEach(i => i.addEventListener('change', () => { G[i.dataset.layer].visible = i.checked; if (!i.checked) clearSelection(); }));
+cutBox.addEventListener('change', () => setCut(cutBox.checked));
+document.getElementById('labelsToggle').addEventListener('change', e => { labelsOn = e.target.checked; });
+const panel = document.getElementById('panel'), layersBtn = document.getElementById('layersBtn');
+const togglePanel = open => { panel.classList.toggle('open', open); layersBtn.setAttribute('aria-expanded', open); };
+layersBtn.addEventListener('click', () => togglePanel(!panel.classList.contains('open')));
+document.getElementById('closePanel').addEventListener('click', () => togglePanel(false));
+
+// ---------- picking ----------
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), card = document.getElementById('card');
+const pickRoots = [G.electrical, G.plumbing, G.furniture, G.tank, G.walls, G.roof, G.site];
+const helper = new THREE.BoxHelper(undefined, 0xc8612a); helper.visible = false; helper.material.depthTest = false; helper.renderOrder = 10; scene.add(helper);
+let selected = null;
+const visibleChain = o => { for (; o; o = o.parent) if (!o.visible) return false; return true; };
+function pick(cx, cy) {
+  ndc.set(cx / innerWidth * 2 - 1, -cy / innerHeight * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  for (const h of ray.intersectObjects(pickRoots, true)) {
+    if (!visibleChain(h.object)) continue;
+    if (cutOn && h.point.y > CUT + .05 && (h.object.material?.clippingPlanes?.length)) continue; // clipped-away part
+    let o = h.object; while (o && !o.userData.info) o = o.parent;
+    if (o) return o;
+  }
+  return null;
+}
+function select(o) {
+  selected = o; const { name, cat, desc } = o.userData.info;
+  card.querySelector('.cat').textContent = cat; card.querySelector('h3').textContent = name;
+  card.querySelector('p').textContent = desc || '';
+  card.classList.add('show'); helper.setFromObject(o); helper.visible = true;
+  document.getElementById('hint').style.opacity = 0;
+}
+function clearSelection() { selected = null; card.classList.remove('show'); helper.visible = false; }
+card.querySelector('button').addEventListener('click', clearSelection);
+let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) return;
+  const o = pick(e.clientX, e.clientY); o ? select(o) : clearSelection();
+  if (isSmall) togglePanel(false);
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') { clearSelection(); togglePanel(false); } });
+
+// ---------- loop ----------
+function fit() {
+  camera.aspect = innerWidth / innerHeight;
+  if (innerWidth > 760) camera.setViewOffset(innerWidth, innerHeight, 140, 0, innerWidth, innerHeight); else camera.clearViewOffset();
+  camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight);
+}
+addEventListener('resize', fit); fit();
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+renderer.setAnimationLoop(now => {
+  if (tween) {
+    const k = Math.min(1, (now - tween.s) / tween.d), e = ease(k);
+    camera.position.lerpVectors(tween.p0, tween.p1, e); orbit.target.lerpVectors(tween.t0, tween.t1, e);
+    if (k === 1) tween = null;
+  }
+  orbit.update();
+  if (selected) helper.setFromObject(selected);
+  renderer.render(scene, camera);
+  placeLabels();
+});
+setView('dollhouse', true);
+requestAnimationFrame(() => document.getElementById('loader').classList.add('done'));
+setTimeout(() => { document.getElementById('hint').style.opacity = 0; }, 9000);
+</script>
+</body>
+</html>

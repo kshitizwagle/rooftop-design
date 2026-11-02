@@ -3,10 +3,11 @@
 An interactive mobile-friendly Three.js model of a proposed rooftop home office (9 × 10 ft), living room (11 × 10 ft), and **separately accessible** bathroom (5 × 7 ft) with 10 ft walls and sloped EPS roofs.
 
 ## Features
-- Full 3D orbit, zoom and pan on desktop/mobile
-- Exterior, cutaway, overhead, and room-focused camera presets
-- Layer controls for roof, exterior walls, furniture, power/data points, plumbing, labels and relocated water tank
-- Click/tap inspection of switches, sockets, CAT6, ceiling lights, AC points, WC, basin, shower, floor drain, and fixtures
+- Full 3D orbit, zoom and pan on desktop and mobile, with smooth camera moves
+- Views: Exterior, Dollhouse (walls cut at 4.5 ft), Plan, and Office / Living / Bath close-ups
+- Layers for roof, walls, furniture, electrical & data, plumbing, room labels and the proposed water tank
+- Tap any fixture, socket, light, door or window for a description
+- Bathroom is fully enclosed and opens onto its own covered nook off the walkway, never through a room
 - Static hosting. No backend or build step required. ES modules served from jsDelivr CDN.
 
 ## Run
