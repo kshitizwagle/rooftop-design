@@ -460,12 +460,12 @@ function hdoor(p, x, z0, z1, y0) {
   B(p, x - .02, x + .06, y0, y1 - f, z0 + f, z1 - f, std('#6b4a35', { roughness: .7 }));
   B(p, x + .06, x + .16, y0 + 3.3, y0 + 3.45, z1 - .7, z1 - .35, M.steel);
 }
-const east = item(G.site, 'East side windows + doors', 'Existing', 'From the owner\'s sketch: shop window (6 × 4.5 ft first floor, 2.5 × 4.5 ft ground), a 4 ft stair window, and a door from the veranda into the stair lobby on each floor.');
+const east = item(G.site, 'East side windows + doors', 'Existing', 'From the owner\'s sketch: shop window (6 × 4.5 ft first floor, 2.5 × 4.5 ft ground), a 4 ft stair window, and a door from the veranda into the stair lobby on each floor, right against the shop wall.');
 for (let f = 0; f < 2; f++) {
   const fl0 = -10.8 - f * FL;
   if (f === 0) hwin(east, 25.25, 2.4, 8.4, fl0 + 3, fl0 + 7.5); else hwin(east, 25.25, 4.15, 6.65, fl0 + 3, fl0 + 7.5);
   hwin(east, XS + .375, 19.5, 23.5, fl0 + 3, fl0 + 7.5);
-  hdoor(east, XS + .375, 15.25, 18.75, fl0);
+  hdoor(east, XS + .375, 11.0, 14.5, fl0); // right against the shop wall
 }
 const vr = item(G.site, 'First-floor veranda railing', 'Existing', 'Railing along the open edge of the first-floor veranda.');
 for (let z = 11.2; z < 22.7; z += 1.2) B(vr, 24.95, 25.05, -10.8, -7.3, z - .05, z + .05, M.black);
@@ -1087,14 +1087,15 @@ const grid = new THREE.GridHelper(120, 24, 0xc9c3b8, 0xd8d3ca);
 grid.material.transparent = true; grid.material.opacity = .5; grid.position.set(12.6, -23.58, 14); scene.add(grid);
 const v = new THREE.Vector3();
 function placeLabels() {
-  const show = labelsOn && (cutOn || !G.walls.visible);
+  const above = camera.position.y > 6;
+  const show = labelsOn && above && (cutOn || !G.walls.visible);
   for (const r of ROOMS) {
     v.copy(r.p).project(camera);
     const ok = show && v.z < 1 && (!r.lay || r.lay === layout);
     r.el.style.display = ok ? '' : 'none';
     if (ok) r.el.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px,${(-v.y * .5 + .5) * innerHeight}px) translate(-50%,-50%)`;
   }
-  const showDims = dimsOn && cutOn; // dimension strings read cleanly only in the cutaway / plan views
+  const showDims = dimsOn && cutOn && above; // dimension strings read cleanly only in the cutaway / plan views
   dimGroup.visible = showDims;
   for (const d of DIMS) {
     v.copy(d.p).project(camera);
