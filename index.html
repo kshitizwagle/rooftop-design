@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rooftop Studio · 3D Renovation Concept</title>
 <meta name="description" content="Interactive 3D concept of a rooftop home office, living room and separately accessible bathroom.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ebe7e0; --ink:#1d2126; --muted:#6a6f77; --line:#d9d4cb;
-  --panel:rgba(255,255,255,.86); --chip:#f3f0ea; --accent:#c8612a; --accent-ink:#fff;
+  --bg:#f5f3ef; --ink:#1d2126; --muted:#5f646c; --line:#dcd7cd;
+  --panel:rgba(255,255,255,.86); --chip:#efebe4; --accent:#a94e1f; --accent-ink:#fff;
   --switch:#f2b632; --socket:#e2554f; --data:#3a8de0; --hvac:#8a63d2; --light:#f6d26b; --water:#21a67a;
   --r:14px; --shadow:0 10px 30px rgba(40,32,20,.12), 0 1px 2px rgba(40,32,20,.08);
-  font:14px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink);
+  font:13px/1.45 "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif; color:var(--ink);
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;-webkit-tap-highlight-color:transparent}
@@ -79,8 +76,8 @@ details li{margin:3px 0}
 .preset .chips{display:flex;gap:3px}
 .preset .chips i{width:16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,.12)}
 .surface{margin:0 0 12px}
-.surface h3{margin:0;font-size:12.5px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
-.surface h3 span{font-weight:500;color:var(--muted);font-size:11.5px;text-align:right}
+.surface h3{margin:0;font-size:12.5px;font-weight:600}
+.surface h3 span{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:1px}
 .surface p{margin:1px 0 6px;font-size:11px;color:var(--muted)}
 .sw-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
 .swatch{aspect-ratio:1;border-radius:6px;border:1px solid rgba(0,0,0,.14);padding:0;position:relative}
@@ -101,7 +98,13 @@ details li{margin:3px 0}
 #compass svg{width:48px;height:48px;display:block}
 #compass .tip{position:absolute;right:64px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11.5px;background:var(--ink);color:#fff;border-radius:6px;padding:4px 8px;opacity:0;pointer-events:none;transition:opacity .2s}
 #compass:hover .tip,#compass:focus-visible .tip{opacity:1}
-#hint{position:absolute;left:20px;bottom:30px;font-size:12px;color:var(--muted);pointer-events:none;transition:opacity .4s}
+#legend{position:absolute;left:20px;bottom:22px;display:flex;flex-direction:column;gap:5px;background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--ink);box-shadow:var(--shadow);transition:opacity .2s;pointer-events:none}
+#legend h2{margin:0 0 2px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#legend span{display:flex;align-items:center;gap:7px}
+#legend i{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.18)}
+#legend em{font-style:normal;color:var(--muted);font-size:10.5px;margin-top:3px;max-width:190px}
+.dim{position:absolute;left:0;top:0;font-size:11px;font-weight:600;color:#2c2c2c;background:rgba(245,243,239,.92);padding:1px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+#hint{position:absolute;left:20px;bottom:200px;font-size:12px;color:var(--muted);pointer-events:none;transition:opacity .4s}
 
 /* room labels */
 #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -122,6 +125,7 @@ details li{margin:3px 0}
   #views{bottom:calc(14px + env(safe-area-inset-bottom));left:12px;right:12px;transform:none;max-width:none}
   #card{left:12px;right:12px;width:auto;bottom:calc(70px + env(safe-area-inset-bottom))}
   #hint{left:0;right:0;text-align:center;bottom:calc(74px + env(safe-area-inset-bottom))}
+  #legend{display:none}
   #compass{right:12px;bottom:auto;top:56px;width:48px;height:48px}
   #compass svg{width:42px;height:42px}
   #compass .tip{display:none}
@@ -176,6 +180,7 @@ details li{margin:3px 0}
   <label class="row"><span class="lbl">Plumbing &amp; drainage</span><input type="checkbox" data-layer="plumbing" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Water tank (proposed)</span><input type="checkbox" data-layer="tank" checked><span class="sw"></span></label>
   <div class="row" style="cursor:default"><span class="lbl">Balcony depth</span><span class="seg" id="balSeg"></span></div>
+  <label class="row"><span class="lbl">Dimensions</span><input type="checkbox" id="dimsToggle" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Room labels</span><input type="checkbox" id="labelsToggle" checked><span class="sw"></span></label>
   <hr>
   <details>
@@ -219,6 +224,15 @@ details li{margin:3px 0}
   </g></svg>
   <span class="tip">Turn north up</span>
 </button>
+<div id="legend" aria-label="Key">
+  <h2>Key</h2>
+  <span><i data-key="top"></i>New EPS walls (rooftop)</span>
+  <span><i data-key="rcc"></i>New RCC stair cover</span>
+  <span><i data-key="body"></i>Existing house</span>
+  <span><i data-key="roof"></i>New roof panels</span>
+  <span><i style="background:#9aa5ae"></i>Jasta shed (salvaged + new)</span>
+  <em>Concept only — not for construction. Verify on site with an engineer.</em>
+</div>
 <div id="hint">Drag to orbit · scroll or pinch to zoom · tap anything for details</div>
 <div id="card" role="status" aria-live="polite"><button aria-label="Close details">×</button><span class="cat"></span><h3></h3><p></p></div>
 
@@ -252,7 +266,7 @@ renderer.toneMappingExposure = 1.0;
 renderer.localClippingEnabled = true;
 document.getElementById('scene').appendChild(renderer.domElement);
 
-const BG = new THREE.Color('#ebe7e0');
+const BG = new THREE.Color('#f5f3ef');
 const scene = new THREE.Scene();
 scene.background = BG;
 scene.fog = new THREE.Fog(BG, 100, 200);
@@ -995,7 +1009,29 @@ const ROOMS = [
   const el = document.createElement('div'); el.className = 'room'; el.innerHTML = `${n}${s ? `<small>${s}</small>` : ''}`;
   labelsEl.appendChild(el); return { el, p: new THREE.Vector3(...p), lay };
 });
-let labelsOn = true, cutOn = true;
+let labelsOn = true, cutOn = true, dimsOn = !isSmall;
+document.getElementById('dimsToggle').checked = dimsOn;
+// overall dimension strings on the roof plane, offset outside the slab edge
+const dimGroup = new THREE.Group(); scene.add(dimGroup);
+const dimMat = new THREE.LineBasicMaterial({ color: 0x2c2c2c, transparent: true, opacity: .7 });
+const DIMS = [];
+function dimString(a, b, off, text) {
+  const y = .15, A = new THREE.Vector3(a[0], y, a[1]), Bv = new THREE.Vector3(b[0], y, b[1]), o = new THREE.Vector3(off[0], 0, off[1]);
+  const pa = A.clone().add(o), pb = Bv.clone().add(o), n = o.clone().normalize();
+  const seg = (p, q) => dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([p, q]), dimMat));
+  seg(pa, pb); seg(A.clone().addScaledVector(n, .4), pa.clone().addScaledVector(n, .4)); seg(Bv.clone().addScaledVector(n, .4), pb.clone().addScaledVector(n, .4));
+  const d = pb.clone().sub(pa).normalize(), t = new THREE.Vector3(d.x + d.z, 0, d.z - d.x).multiplyScalar(.25); // 45° architectural tick
+  seg(pa.clone().sub(t), pa.clone().add(t)); seg(pb.clone().sub(t), pb.clone().add(t));
+  const el = document.createElement('div'); el.className = 'dim'; el.textContent = text; labelsEl.appendChild(el);
+  DIMS.push({ el, p: pa.clone().add(pb).multiplyScalar(.5) });
+}
+dimString([0, 0], [25.25, 0], [0, -2.2], `25'-3"`);
+dimString([0, 0], [0, 28], [-2.2, 0], `28'-0"`);
+dimString([0, 28], [22.25, 28], [0, 2.2], `22'-3"`);
+dimString([25.25, 0], [25.25, 23.25], [2.2, 0], `23'-3"`);
+dimString([XL - T / 2, ZA], [XL - T / 2, ZB2], [-1, 0], `4'-9"`);
+const grid = new THREE.GridHelper(120, 24, 0xc9c3b8, 0xd8d3ca);
+grid.material.transparent = true; grid.material.opacity = .5; grid.position.set(12.6, -23.58, 14); scene.add(grid);
 const v = new THREE.Vector3();
 function placeLabels() {
   const show = labelsOn && (cutOn || !G.walls.visible);
@@ -1004,6 +1040,14 @@ function placeLabels() {
     const ok = show && v.z < 1 && (!r.lay || r.lay === layout);
     r.el.style.display = ok ? '' : 'none';
     if (ok) r.el.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px,${(-v.y * .5 + .5) * innerHeight}px) translate(-50%,-50%)`;
+  }
+  const showDims = dimsOn && cutOn; // dimension strings read cleanly only in the cutaway / plan views
+  dimGroup.visible = showDims;
+  for (const d of DIMS) {
+    v.copy(d.p).project(camera);
+    const ok = showDims && v.z < 1;
+    d.el.style.display = ok ? '' : 'none';
+    if (ok) d.el.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px,${(-v.y * .5 + .5) * innerHeight}px) translate(-50%,-50%)`;
   }
 }
 labelsEl.querySelectorAll('.room').forEach(e => { e.style.left = '0'; e.style.top = '0'; });
@@ -1123,9 +1167,11 @@ function applyPaint() {
     const o = optOf(S, paint[S.key]); paint[S.key] = o.id;
     for (const m of S.mats) m.color.set(o.hex);
     const box = document.querySelector(`[data-surface=${S.key}]`);
-    box.querySelector('h3 span').textContent = o.label;
+    box.querySelector('h3 span').textContent = `${o.label} · ${o.hex.toUpperCase()}`;
     box.querySelectorAll('.swatch').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === o.id));
   }
+  const sw = { top: M.wall, rcc: RCC, body: M.building, roof: roofMat };
+  document.querySelectorAll('#legend i[data-key]').forEach(i => { i.style.background = '#' + sw[i.dataset.key].color.getHexString(); });
   document.querySelectorAll('.preset').forEach((b, i) => b.setAttribute('aria-pressed', SURFACES.every(S => PRESETS[i][1][S.key] === paint[S.key])));
   try { localStorage.setItem('rooftop-paint', JSON.stringify(paint)); } catch {}
 }
@@ -1137,7 +1183,7 @@ function applyPaint() {
     const grid = d.querySelector('.sw-grid');
     for (const o of S.opts) {
       const b = document.createElement('button'); b.className = 'swatch'; b.dataset.id = o.id;
-      b.style.background = o.hex; b.title = o.label; b.setAttribute('aria-label', o.label);
+      b.style.background = o.hex; b.title = `${o.label} · ${o.hex.toUpperCase()}`; b.setAttribute('aria-label', o.label);
       b.addEventListener('click', () => { paint[S.key] = o.id; applyPaint(); });
       grid.appendChild(b);
     }
@@ -1176,6 +1222,7 @@ function applyPaint() {
 document.querySelectorAll('[data-layer]').forEach(i => i.addEventListener('change', () => { G[i.dataset.layer].visible = i.checked; if (!i.checked) clearSelection(); }));
 cutBox.addEventListener('change', () => setCut(cutBox.checked));
 document.getElementById('labelsToggle').addEventListener('change', e => { labelsOn = e.target.checked; });
+document.getElementById('dimsToggle').addEventListener('change', e => { dimsOn = e.target.checked; });
 const panel = document.getElementById('panel'), layersBtn = document.getElementById('layersBtn');
 const togglePanel = open => { panel.classList.toggle('open', open); layersBtn.setAttribute('aria-expanded', open); };
 layersBtn.addEventListener('click', () => togglePanel(!panel.classList.contains('open')));
@@ -1203,9 +1250,10 @@ function select(o) {
   card.querySelector('.cat').textContent = cat; card.querySelector('h3').textContent = name;
   card.querySelector('p').textContent = desc || '';
   card.classList.add('show'); helper.setFromObject(o); helper.visible = true;
+  document.getElementById('legend').style.opacity = 0;
   document.getElementById('hint').style.opacity = 0;
 }
-function clearSelection() { selected = null; card.classList.remove('show'); helper.visible = false; }
+function clearSelection() { selected = null; card.classList.remove('show'); helper.visible = false; document.getElementById('legend').style.opacity = 1; }
 card.querySelector('button').addEventListener('click', clearSelection);
 let down = null;
 renderer.domElement.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
