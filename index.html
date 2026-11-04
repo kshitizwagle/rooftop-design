@@ -202,7 +202,7 @@ document.getElementById('scene').appendChild(renderer.domElement);
 const BG = new THREE.Color('#ebe7e0');
 const scene = new THREE.Scene();
 scene.background = BG;
-scene.fog = new THREE.Fog(BG, 70, 150);
+scene.fog = new THREE.Fog(BG, 100, 200);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.55;
@@ -213,7 +213,7 @@ orbit.enableDamping = true;
 orbit.dampingFactor = 0.08;
 orbit.maxPolarAngle = Math.PI * 0.495;
 orbit.minDistance = 6;
-orbit.maxDistance = 110;
+orbit.maxDistance = 140;
 
 scene.add(new THREE.HemisphereLight(0xfff7ec, 0xb9b1a4, 0.9));
 const sun = new THREE.DirectionalLight(0xfff1dc, 2.6);
@@ -221,7 +221,7 @@ sun.position.set(-18, 34, 26);
 sun.target.position.set(13, 0, 13.5);
 sun.castShadow = true;
 sun.shadow.mapSize.setScalar(isSmall ? 1024 : 2048);
-Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 5, far: 100 });
+Object.assign(sun.shadow.camera, { left: -36, right: 36, top: 36, bottom: -36, near: 5, far: 120 });
 sun.shadow.bias = -0.0004;
 sun.shadow.normalBias = 0.04;
 scene.add(sun, sun.target);
@@ -356,13 +356,20 @@ function lshape(parent, pts, y0, y1, mat, cast = true) {
 const SLAB = [[0, 0], [26.25, 0], [26.25, 22.25], [22.25, 22.25], [22.25, 27], [0, 27]];
 const HOUSE = [[0, 0], [26.25, 0], [26.25, ZA - .375], [XS + .375, ZA - .375], [XS + .375, 27], [0, 27]];
 const ground = new THREE.Mesh(new THREE.CircleGeometry(90, 48), std('#d9d2c4', { roughness: 1 }));
-ground.rotation.x = -Math.PI / 2; ground.position.y = -12; ground.receiveShadow = true; G.site.add(ground);
-const house = item(G.site, 'Existing house (ground floor)', 'Existing', 'Single-storey RCC house per the approved drawing: shop, bedroom, master bedroom, toilet, veranda and dog-leg stair. 10 ft floor height, 2 ft plinth. Owner confirms the frame can take another floor.');
-lshape(house, HOUSE, -12, -0.8, M.building);
+ground.rotation.x = -Math.PI / 2; ground.position.y = -23.6; ground.receiveShadow = true; G.site.add(ground);
+// two existing storeys (ground + first floor, same plan), 10 ft floor height, 0.8 ft slabs, 2 ft plinth
+const FL = 10.8; // floor-to-floor
+const house = item(G.site, 'Existing house (ground + first floor)', 'Existing', 'Two-storey RCC house, both floors on the approved plan: shop, bedroom, master bedroom, toilet, veranda and dog-leg stair. 10 ft floor height, 2 ft plinth. Owner confirms the frame can take another floor.');
 const darkGlass = std('#3c4650', { roughness: .3, metalness: .2 });
-for (const [x0, x1, z0, z1] of [[3, 9, -.06, 0], [17, 23, -.06, 0], [-.06, 0, 2.5, 7.5], [-.06, 0, 17, 23], [4, 10, 27, 27.06], [16, 18.5, 27, 27.06]])
-  B(house, x0, x1, -7.3, -2.8, z0, z1, darkGlass, { cast: false });
-B(house, 25.7, 26.2, -12, -0.8, 21.7, 22.2, M.parapet); // veranda corner column
+for (let f = 0; f < 2; f++) {
+  const top = -0.8 - f * FL; // underside of the slab above this floor
+  lshape(house, HOUSE, top - 10, top, M.building);
+  if (f === 0) lshape(house, SLAB, top - 10.8, top - 10, M.slab); // first-floor slab band
+  for (const [x0, x1, z0, z1] of [[3, 9, -.06, 0], [17, 23, -.06, 0], [-.06, 0, 2.5, 7.5], [-.06, 0, 17, 23], [4, 10, 27, 27.06], [16, 18.5, 27, 27.06]])
+    B(house, x0, x1, top - 6.5, top - 2, z0, z1, darkGlass, { cast: false });
+}
+lshape(house, HOUSE, -23.6, -21.6, M.parapet); // plinth
+B(house, 25.7, 26.2, -21.6, -0.8, 21.7, 22.2, M.parapet); // veranda corner column, both floors
 const slab = item(G.site, 'Existing RCC roof slab', 'Structure', 'About 690 sq ft (building area on the drawing: 689.75 sq ft). It leaks in places, so after this work every part of it sits under a new roof or the jasta shed.');
 lshape(slab, SLAB, -0.8, 0, M.slab);
 const terr = item(G.site, 'Terrace floor', 'Finish', 'Existing slab top. Clean, patch the cracks and apply a waterproof coat before the new roofs go on.');
@@ -913,14 +920,14 @@ labelsEl.querySelectorAll('.room').forEach(e => { e.style.left = '0'; e.style.to
 
 // ---------- views ----------
 const VIEWS = isSmall ? {
-  exterior: [[-8, 46, 74], [13, 3, 12], true, false],
+  exterior: [[-12, 36, 100], [13, -7, 12], true, false],
   dollhouse: [[-22, 52, 54], [12, 0, 13.5], false, true],
   plan: [[13.1, 84, 13.6], [13.1, 0, 13.5], false, true],
   left: [[6.5, 30, 27], [6.5, 1, 5], false, true],
   right: [[-14, 30, 34], [8, 1, 20.5], false, true],
   bath: [[5, 40, 32], [5, 0, 12.4], false, true],
 } : {
-  exterior: [[-2, 36, 64], [14, 2, 12], true, false],
+  exterior: [[-6, 26, 78], [14, -7, 12], true, false],
   dollhouse: [[-17, 38, 44], [12, 0, 13.5], false, true],
   plan: [[13.1, 58, 13.52], [13.1, 0, 13.5], false, true],
   left: [[6.5, 22, 23], [6.5, 1, 5], false, true],
