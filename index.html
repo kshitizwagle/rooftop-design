@@ -460,11 +460,11 @@ function hdoor(p, x, z0, z1, y0) {
   B(p, x - .02, x + .06, y0, y1 - f, z0 + f, z1 - f, std('#6b4a35', { roughness: .7 }));
   B(p, x + .06, x + .16, y0 + 3.3, y0 + 3.45, z1 - .7, z1 - .35, M.steel);
 }
-const east = item(G.site, 'East side windows + doors', 'Existing', 'From the owner\'s sketch: shop window (6 × 4.5 ft first floor, 2.5 × 4.5 ft ground), a 4 ft stair window, and a door from the veranda into the stair lobby on each floor, right against the shop wall.');
+const east = item(G.site, 'East side windows + doors', 'Existing', 'From the owner\'s sketch: shop window (6 × 4.5 ft first floor, 2.5 × 4.5 ft ground), a 6 × 4.5 ft stair window, and a door from the veranda into the stair lobby on each floor, right against the shop wall.');
 for (let f = 0; f < 2; f++) {
   const fl0 = -10.8 - f * FL;
   if (f === 0) hwin(east, 25.25, 2.4, 8.4, fl0 + 3, fl0 + 7.5); else hwin(east, 25.25, 4.15, 6.65, fl0 + 3, fl0 + 7.5);
-  hwin(east, XS + .375, 19.5, 23.5, fl0 + 3, fl0 + 7.5);
+  hwin(east, XS + .375, 16.2, 22.2, fl0 + 3, fl0 + 7.5); // stair window, 6 × 4.5 ft
   hdoor(east, XS + .375, 11.0, 14.5, fl0); // right against the shop wall
 }
 const vr = item(G.site, 'First-floor veranda railing', 'Existing', 'Railing along the open edge of the first-floor veranda.');
