@@ -4,7 +4,7 @@ An interactive, mobile-friendly Three.js model of the rooftop addition on the ex
 
 **The plan**
 - The brick room with the jasta roof at the south-west comes down.
-- The west half gets the new rooms, the bath and a balcony. New walls sit on the existing wall lines, and the bath sits directly over the existing toilet so it drains into the same stack.
+- The west half gets the new rooms, the bath and a south balcony. New walls sit on the existing wall lines, and the bath sits directly over the existing toilet so it drains into the same stack.
 - The stair gets an RCC cover with the 1,000 L water tank on its slab.
 - The east half becomes a covered terrace under a jasta shed: salvaged sheets from the old room first, new sheets for the rest, so the leaking slab is fully covered.
 
@@ -14,6 +14,8 @@ An interactive, mobile-friendly Three.js model of the rooftop addition on the ex
   - **B · Living + bed/desk**: living room north; bedroom plus a south-facing desk behind a curtain south
   - **C · Office/lounge + bedroom**: office and lounge share the north room; plain bedroom south
 - Curtain toggle to see the studio open or closed off
+- Paint tab: colour the house walls, bands and parapets, rooftop rooms, window frames and roof sheets with named RAL Classic shades (any Nepali dealer can tint to a RAL code) and SY Panel roof colours, plus ready-made schemes
+- Balcony depth switch (2.5 / 3 / 4 / 5 ft) for the south balcony
 - North compass (bottom right): the needle shows where north is; tap it to turn north up
 - Full 3D orbit, zoom and pan on desktop and mobile, with smooth camera moves
 - Views: Exterior, Dollhouse (walls cut at 4.5 ft), Plan, and Office / Living / Bath close-ups

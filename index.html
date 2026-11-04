@@ -66,6 +66,26 @@ details ul{margin:6px 0 4px;padding-left:18px}
 details li{margin:3px 0}
 .fine{font-size:11px;color:var(--muted);margin:10px 2px 0}
 #layersBtn,#closePanel{display:none}
+.seg{display:inline-flex;gap:2px;padding:2px;background:var(--chip);border-radius:8px}
+.seg button{border:0;background:transparent;border-radius:6px;padding:4px 7px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tabs{display:flex;gap:2px;padding:3px;margin:0 0 12px;background:var(--chip);border-radius:9px}
+.tabs button{flex:1;border:0;background:transparent;border-radius:7px;padding:6px 0;font-weight:600;font-size:12.5px;color:var(--muted)}
+.tabs button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+[data-pane][hidden]{display:none}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 12px}
+.preset{display:flex;flex-direction:column;gap:5px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 8px;font-size:11.5px;font-weight:500;line-height:1.25}
+.preset[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.preset .chips{display:flex;gap:3px}
+.preset .chips i{width:16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,.12)}
+.surface{margin:0 0 12px}
+.surface h3{margin:0;font-size:12.5px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.surface h3 span{font-weight:500;color:var(--muted);font-size:11.5px;text-align:right}
+.surface p{margin:1px 0 6px;font-size:11px;color:var(--muted)}
+.sw-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.swatch{aspect-ratio:1;border-radius:6px;border:1px solid rgba(0,0,0,.14);padding:0;position:relative}
+.swatch[aria-pressed=true]{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+.swatch:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 /* selection card */
 #card{position:absolute;left:20px;bottom:22px;width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:13px 14px 14px;transform:translateY(8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
@@ -131,11 +151,15 @@ details li{margin:3px 0}
   <p id="note"></p>
 </header>
 
-<button id="layersBtn" aria-controls="panel" aria-expanded="false">Layers</button>
+<button id="layersBtn" aria-controls="panel" aria-expanded="false">Layers · Paint</button>
 
 <aside id="panel" aria-label="Layers">
   <button id="closePanel" aria-label="Close layers">✕</button>
-  <h2>Layers</h2>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="layers" aria-selected="true">Layers</button>
+    <button role="tab" data-tab="paint" aria-selected="false">Paint</button>
+  </div>
+  <div data-pane="layers">
   <label class="row"><span class="lbl">Roof</span><input type="checkbox" data-layer="roof"><span class="sw"></span></label>
   <label class="row"><span class="lbl">Walls, doors &amp; windows</span><input type="checkbox" data-layer="walls" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Cut walls at 4.5 ft</span><input type="checkbox" id="cut" checked><span class="sw"></span></label>
@@ -151,19 +175,28 @@ details li{margin:3px 0}
   </div>
   <label class="row"><span class="lbl">Plumbing &amp; drainage</span><input type="checkbox" data-layer="plumbing" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Water tank (proposed)</span><input type="checkbox" data-layer="tank" checked><span class="sw"></span></label>
+  <div class="row" style="cursor:default"><span class="lbl">Balcony depth</span><span class="seg" id="balSeg"></span></div>
   <label class="row"><span class="lbl">Room labels</span><input type="checkbox" id="labelsToggle" checked><span class="sw"></span></label>
   <hr>
   <details>
     <summary>Assumptions</summary>
     <ul>
       <li>Footprint from the approved drawing (plot 268): about 25'3" × 28', roughly 690 sq ft. The brick room with the jasta roof at the south-west is demolished.</li>
-      <li>New rooms, bath and balcony use the west half. New walls sit on the existing wall lines; the bath sits over the existing toilet so it drains into the same stack.</li>
+      <li>New rooms, bath and a south balcony (depth switchable in Layers) use the west half. New walls sit on the existing wall lines; the bath sits over the existing toilet so it drains into the same stack.</li>
       <li>The stair gets an RCC cover with the 1,000 L tank on its slab.</li>
       <li>The east half is a covered terrace under a jasta shed — salvaged sheets from the old room first, new sheets for the rest — so the leaking slab is fully covered.</li>
       <li>Owner confirms the frame can take another floor; still get an engineer to check the tank slab and the new wall lines.</li>
     </ul>
   </details>
   <p class="fine">Concept only — not a measured survey or permit drawing. Verify dimensions, slab loading, waterproofing and service routes on site.</p>
+  </div>
+  <div data-pane="paint" hidden>
+    <h2>Schemes</h2>
+    <div class="presets" id="presets"></div>
+    <div id="surfaces"></div>
+    <p class="fine">Colours are RAL Classic shades; any Nepali paint dealer (Asian Paints, Berger, Nerolac…) can tint to a RAL code. Roof colours are the SY Panel sheet colours. Screens shift colour — check a physical shade card in daylight before buying.</p>
+    <p style="margin:8px 0 0"><button class="btn" id="paintReset" style="border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600">Reset colours</button></p>
+  </div>
 </aside>
 
 <nav id="views" aria-label="Camera views">
@@ -367,7 +400,13 @@ function item(parent, name, cat, desc) {
 // Rooms: NW bedroom 13 × 10, NE shop 10 × 10, SW master bedroom 13 × 11, toilet 4 ft deep.
 const XL = 0.375, XM = 14.125, XE = 24.875, XS = 21.875;   // west wall, middle wall, east wall, stair east wall
 const ZN = 0.375, ZA = 11.125, ZB2 = 15.875, ZS = 27.625;  // north wall, bed|toilet, toilet|M.bed, south wall
-const XW = 4.125;                                           // new: balcony | south room
+const BAL_OPTS = [2.5, 3, 4, 5];                            // balcony depth options (ft)
+const BD = (() => {
+  let v = parseFloat(new URLSearchParams(location.search).get('balcony'));
+  if (!BAL_OPTS.includes(v)) { try { v = parseFloat(localStorage.getItem('rooftop-balcony')); } catch {} }
+  return BAL_OPTS.includes(v) ? v : 3;
+})();
+const ZBAL = 27.5 - BD - T / 2;                              // new: south room | balcony wall line
 function lshape(parent, pts, y0, y1, mat, cast = true) {
   const sh = new THREE.Shape(pts.map(([x, z]) => new THREE.Vector2(x, z)));
   const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: y1 - y0, bevelEnabled: false }), mat);
@@ -385,14 +424,40 @@ const darkGlass = std('#3c4650', { roughness: .3, metalness: .2 });
 for (let f = 0; f < 2; f++) {
   const top = -0.8 - f * FL; // underside of the slab above this floor
   lshape(house, HOUSE, top - 10, top, M.building);
-  if (f === 0) lshape(house, SLAB, top - 10.8, top - 10, M.slab); // first-floor slab band
+  if (f === 0) lshape(house, SLAB, top - 10.8, top - 10, M.parapet); // first-floor slab band
   for (const [x0, x1, z0, z1] of [[3, 9, -.06, 0], [17, 23, -.06, 0], [-.06, 0, 2.5, 7.5], [-.06, 0, 18, 24], [4, 10, 28, 28.06], [16, 18.5, 28, 28.06]])
     B(house, x0, x1, top - 6.5, top - 2, z0, z1, darkGlass, { cast: false });
 }
 lshape(house, HOUSE, -23.6, -21.6, M.parapet); // plinth
+// east side (shop + veranda), from the owner's sketch. Floor levels: first floor −10.8, ground −21.6.
+function hwin(p, x, z0, z1, y0, y1) {
+  const f = .2, m = (z0 + z1) / 2;
+  B(p, x, x + .1, y0, y0 + f, z0, z1, M.frame); B(p, x, x + .1, y1 - f, y1, z0, z1, M.frame);
+  B(p, x, x + .1, y0, y1, z0, z0 + f, M.frame); B(p, x, x + .1, y0, y1, z1 - f, z1, M.frame);
+  if (z1 - z0 > 3) B(p, x, x + .08, y0, y1, m - .05, m + .05, M.frame);
+  B(p, x - .02, x + .04, y0 + f, y1 - f, z0 + f, z1 - f, darkGlass, { cast: false });
+}
+function hdoor(p, x, z0, z1, y0) {
+  const f = .2, y1 = y0 + 7;
+  B(p, x, x + .1, y0, y1, z0, z0 + f, M.frame); B(p, x, x + .1, y0, y1, z1 - f, z1, M.frame); B(p, x, x + .1, y1 - f, y1, z0, z1, M.frame);
+  B(p, x - .02, x + .06, y0, y1 - f, z0 + f, z1 - f, std('#6b4a35', { roughness: .7 }));
+  B(p, x + .06, x + .16, y0 + 3.3, y0 + 3.45, z1 - .7, z1 - .35, M.steel);
+}
+const east = item(G.site, 'East side windows + doors', 'Existing', 'From the owner\'s sketch: shop window (6 × 4.5 ft first floor, 2.5 × 4.5 ft ground), a 4 ft stair window, and a door from the veranda into the stair lobby on each floor.');
+for (let f = 0; f < 2; f++) {
+  const fl0 = -10.8 - f * FL;
+  if (f === 0) hwin(east, 25.25, 2.4, 8.4, fl0 + 3, fl0 + 7.5); else hwin(east, 25.25, 4.15, 6.65, fl0 + 3, fl0 + 7.5);
+  hwin(east, XS + .375, 19.5, 23.5, fl0 + 3, fl0 + 7.5);
+  hdoor(east, XS + .375, 15.25, 18.75, fl0);
+}
+const vr = item(G.site, 'First-floor veranda railing', 'Existing', 'Railing along the open edge of the first-floor veranda.');
+for (let z = 11.2; z < 22.7; z += 1.2) B(vr, 24.95, 25.05, -10.8, -7.3, z - .05, z + .05, M.black);
+B(vr, 24.9, 25.1, -7.4, -7.25, 10.75, 22.7, M.black);
+for (let x = 22.6; x < 24.6; x += 1.2) B(vr, x - .05, x + .05, -10.8, -7.3, 22.95, 23.05, M.black);
+B(vr, 22.25, 24.7, -7.4, -7.25, 22.9, 23.1, M.black);
 B(house, 24.7, 25.2, -21.6, -0.8, 22.7, 23.2, M.parapet); // veranda corner column, both floors
 const slab = item(G.site, 'Existing RCC roof slab', 'Structure', 'About 690 sq ft (building area on the drawing: 689.75 sq ft). It leaks in places, so after this work every part of it sits under a new roof or the jasta shed.');
-lshape(slab, SLAB, -0.8, 0, M.slab);
+lshape(slab, SLAB, -0.8, 0, M.parapet);
 const terr = item(G.site, 'Terrace floor', 'Finish', 'Existing slab top. Clean, patch the cracks and apply a waterproof coat before the new roofs go on.');
 lshape(terr, SLAB, 0, .03, std('#fff', { map: tex(deckTex, 6, 6), roughness: .9 }), false);
 // parapets only where no new wall sits on the edge
@@ -426,7 +491,8 @@ plant(G.site, 24, 1.3, 1.1); plant(G.site, 24, 21.9, 1); plant(G.site, 22.4, 1.3
 // ---------- floors ----------
 const fl = item(G.furniture, 'Engineered wood floor', 'Finish', 'Wood-look flooring in both rooms, laid on the levelled slab.');
 B(fl, XL + T / 2, XM - T / 2, .03, .07, ZN + T / 2, ZA - T / 2, floorMat(woodTex, 13.4, 10.4), { cast: false });
-B(fl, XW + T / 2, XM - T / 2, .03, .07, ZB2 + T / 2, ZS - T / 2, floorMat(woodTex, 9.6, 11.4), { cast: false });
+B(fl, XL + T / 2, XM - T / 2, .03, .07, ZB2 + T / 2, ZBAL - T / 2, floorMat(woodTex, 13.4, ZBAL - ZB2), { cast: false });
+{ const bt = item(G.furniture, 'Balcony floor', 'Balcony', 'Anti-slip outdoor tile on the existing slab, falling to a drain spout at the south-west corner.'); B(bt, .5, XM - T / 2, .03, .06, ZBAL + T / 2, 27.5, floorMat(tileTex, 13.4, 27.5 - ZBAL), { cast: false }); }
 const bf = item(G.furniture, 'Bathroom floor', 'Finish', 'Anti-slip tile on a waterproof membrane, falling to the floor trap. Turned up the walls at least 6 in.');
 B(bf, XL + T / 2, 8.5 - T / 2, .03, .08, ZA + T / 2, ZB2 - T / 2, floorMat(tileTex, 7.7, 4.4), { cast: false });
 const lob = item(G.furniture, 'Entry lobby', 'Circulation', 'Covered lobby between the rooms, off the stair landing. The bath and both rooms open onto it — nobody walks through a room to reach the bath.');
@@ -505,8 +571,8 @@ function triZ(parent, zFace, pts, mat) { // face at z = const, pts as [x, y]
 }
 // west roof: gable, ridge running north–south over the middle of the west strip
 const RP = .45, RT = .25, RIDGE_X = (XL + XM) / 2, RIDGE_Y = H + (RIDGE_X - XL) * RP;
-for (const z of [ZN, ZS]) triZ(upper, z, [[XL - T / 2, H], [XM + T / 2, H], [RIDGE_X, RIDGE_Y]], M.wall);
-B(upper, XL - .1, XW + .2, H - .6, H, ZS - .2, ZS + .2, M.roofEdge); // beam over the balcony opening
+for (const z of [ZN, ZBAL]) triZ(upper, z, [[XL - T / 2, H], [XM + T / 2, H], [RIDGE_X, RIDGE_Y]], M.wall);
+B(upper, .2, XM, H - .6, H, 27.45, 27.85, M.roofEdge); // edge beam over the balcony
 // stair-cover slab edge fill above the door wall
 B(upper, XM, XS + .2, MH - .01, MH, 16.05, 16.45, RCC);
 
@@ -549,10 +615,10 @@ doorway('Stair-cover door', 'Door', 'Steel door at the top of the existing stair
 // balcony railing on the open west and south edges
 {
   const r = item(openings, 'Balcony railing', 'Balcony', 'Steel railing on top of the existing parapet line, 3.5 ft above the floor.');
-  B(r, 0, .5, 0, 1.2, ZB2 + T / 2, 28, M.parapet); B(r, 0, XW - T / 2, 0, 1.2, 27.5, 28, M.parapet);
-  for (let z = ZB2 + .6; z < 27.8; z += 1.2) B(r, .2, .3, 1.2, 3.5, z - .05, z + .05, M.black);
-  for (let x = .8; x < XW - .3; x += 1.2) B(r, x - .05, x + .05, 1.2, 3.5, 27.7, 27.8, M.black);
-  B(r, .15, .35, 3.45, 3.6, ZB2 + T / 2, 27.85, M.black); B(r, .15, XW - T / 2, 3.45, 3.6, 27.65, 27.85, M.black);
+  B(r, 0, .5, 0, 1.2, ZBAL + T / 2, 28, M.parapet); B(r, 0, XM - T / 2, 0, 1.2, 27.5, 28, M.parapet);
+  for (let z = ZBAL + .6; z < 27.4; z += 1.2) B(r, .2, .3, 1.2, 3.5, z - .05, z + .05, M.black);
+  for (let x = .8; x < XM - .5; x += 1.2) B(r, x - .05, x + .05, 1.2, 3.5, 27.7, 27.8, M.black);
+  B(r, .15, .35, 3.45, 3.6, ZBAL + T / 2, 27.85, M.black); B(r, .15, XM - T / 2, 3.45, 3.6, 27.65, 27.85, M.black);
   const post = item(openings, 'Balcony corner post', 'Balcony', 'Steel post carrying the roof edge over the open balcony corner.');
   B(post, .2, .55, 0, H, 27.45, 27.8, M.frame);
 }
@@ -632,7 +698,7 @@ function point(kind, x, y, z, name, desc) {
 const IN = .3;
 // inner wall faces (+ IN into the room) for placing points
 const fN = ZN + T / 2 + IN, fA = ZA - T / 2 - IN, fAs = ZA + T / 2 + IN, fB = ZB2 - T / 2 - IN, fBs = ZB2 + T / 2 + IN, fS = ZS - T / 2 - IN;
-const fW = XL + T / 2 + IN, fM = XM - T / 2 - IN, fWb = XW + T / 2 + IN;
+const fW = XL + T / 2 + IN, fM = XM - T / 2 - IN;
 /** Wall-split AC indoor unit on a wall face: wall 'n' | 's' | 'e' | 'w', face = wall face coordinate, c = centre along the wall. */
 function ac(wall, face, c, name) {
   const g = item(ctx ? ctx.elec : G.electrical, name, 'AC / ventilation', 'Wall-split inverter AC on its own circuit. Size it with the installer (~1 ton for one of these rooms under an insulated roof).');
@@ -773,52 +839,55 @@ function tv(F, wall, face, c, wid = 3.6) {
 function rug(F, x0, x1, z0, z1) { const g = item(F, 'Rug', 'Finish', ''); B(g, x0, x1, .07, .1, z0, z1, std('#fff', { map: rugTex }), { cast: false }); }
 function coffee(F, x, z, r = 1) { const g = item(F, 'Coffee table', 'Lounge', 'Low round table.'); C(g, x, 1.2, 1.35, z, r, M.oak, 36); C(g, x, .07, 1.2, z, .12, M.black, 12); }
 function balconySet(F) {
-  const g = item(F, 'Balcony seating', 'Balcony', 'Two chairs and a side table on the covered west balcony — evening sun.');
-  for (const z of [18.2, 21.2]) { B(g, .9, 2.6, .07, 1.5, z - .8, z + .8, M.fabric2); B(g, .7, 1.0, 1.5, 3, z - .8, z + .8, M.fabric2); }
-  C(g, 1.8, .07, 1.7, 19.7, .45, M.oak, 24);
-  plant(g, 1.4, 26.4, .9);
+  const g = item(F, 'Balcony seating', 'Balcony', `Two chairs and a side table on the covered south balcony (${BD} ft deep).`), zb = ZBAL + T / 2;
+  for (const x of [2.6, 5.4]) { B(g, x - .8, x + .8, .07, 1.5, zb + .25, zb + 1.85, M.fabric2); B(g, x - .8, x + .8, 1.5, 3, zb + .25, zb + .55, M.fabric2); }
+  C(g, 4, .07, 1.7, zb + 1.1, .4, M.oak, 24);
+  plant(g, 12.7, 27.5 - .75, .8); if (BD >= 4) plant(g, 9.8, 27.5 - .75, .7);
 }
 
-// shared south-room shell pieces per option: north wall (door), west wall (balcony door), south wall (window)
-function southShell(L, doorA, balc, sWin) {
-  run('x', ZB2, 8.5, XM, [doorA], [-T / 2, T / 2]);
-  run('z', XW, ZB2, ZS, [balc], IN_);
-  run('x', ZS, XW, XM, sWin ? [sWin] : []);
+// south room spans the full west width; balcony is an inset strip along the south edge (depth BD, switchable)
+const SZ0 = ZB2 + T / 2, SZ1 = ZBAL - T / 2, SD = SZ1 - SZ0; // south room clear z-range and depth
+const roomSize = `13 × ${Math.round(SD * 2) / 2} ft`, balSize = `13 × ${BD} ft`;
+function southShell(L, doorA, balc, extra) {
+  run('x', ZB2, 8.5, XM, [doorA], [-T / 2, T / 2]);                       // north wall to lobby
+  run('z', XL, ZB2, ZBAL, extra && extra.axis === 'z' ? [extra.o] : [], IN_); // west outside wall
+  run('x', ZBAL, XL, XM, [balc].concat(extra && extra.axis === 'x' ? [extra.o] : [])); // south wall to balcony
   doorway('South room door', 'Door', '2.5 ft door from the lobby.', doorA.a, doorA.b, ZB2, doorA.a < 10, M.door, { inward: 1 });
-  const g = item(L.open, 'Balcony door', 'Door', 'Two-panel sliding glass door onto the west balcony.');
-  B(g, XW - .25, XW + .25, 0, DOOR, balc.a, balc.a + .15, M.frame); B(g, XW - .25, XW + .25, 0, DOOR, balc.b - .15, balc.b, M.frame);
-  B(g, XW - .25, XW + .25, DOOR - .15, DOOR, balc.a, balc.b, M.frame);
+  const g = item(L.open, 'Balcony door', 'Door', `Two-panel sliding glass door onto the south balcony (${balSize}).`);
+  B(g, balc.a, balc.a + .15, 0, DOOR, ZBAL - .25, ZBAL + .25, M.frame); B(g, balc.b - .15, balc.b, 0, DOOR, ZBAL - .25, ZBAL + .25, M.frame);
+  B(g, balc.a, balc.b, DOOR - .15, DOOR, ZBAL - .25, ZBAL + .25, M.frame);
   const mid = (balc.a + balc.b) / 2;
-  B(g, XW - .12, XW - .08, .1, DOOR - .15, balc.a + .15, mid + .1, M.glass, { cast: false });
-  B(g, XW + .08, XW + .12, .1, DOOR - .15, mid - .1, balc.b - .15, M.glass, { cast: false });
-  B(g, XW - .2, XW + .2, .1, DOOR - .15, mid - .05, mid + .05, M.frame);
-  if (sWin) windowIn('South window', 'South-facing UPVC window — the sunniest wall in winter.', 'x', ZS, sWin);
+  B(g, balc.a + .15, mid + .1, .1, DOOR - .15, ZBAL - .12, ZBAL - .08, M.glass, { cast: false });
+  B(g, mid - .1, balc.b - .15, .1, DOOR - .15, ZBAL + .08, ZBAL + .12, M.glass, { cast: false });
+  B(g, mid - .05, mid + .05, .1, DOOR - .15, ZBAL - .2, ZBAL + .2, M.frame);
+  if (extra) windowIn(extra.axis === 'x' ? 'South window' : 'West window', extra.axis === 'x' ? 'South-facing UPVC window onto the balcony.' : 'West-facing UPVC window.', extra.axis, extra.axis === 'x' ? ZBAL : XL, extra.o);
   balconySet(L.furn);
 }
+const bedC = SZ1 - 2.6;               // bed pushed to the balcony side, 5 ft wide
+const roomForNorthWardrobe = bedC - 2.5 - SZ0 >= 2.05;
 
 // ---------- A · office north, bed + lounge south ----------
 defineLayout('a', {
-  stats: [['Office', '13 × 10 ft'], ['Bed + lounge', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
-  note: 'Office in the north room with an east window. South room is the bedroom, with a small lounge corner behind a curtain and the west balcony off it.',
+  stats: [['Office', '13 × 10 ft'], ['Bed + lounge', roomSize], ['Bath', '7.7 × 4.3 ft'], ['Balcony', balSize]],
+  note: 'Office in the north room with an east window. South room is the bedroom, with a lounge corner by the door behind a curtain and the south balcony off it.',
   zones: ['Office', 'Bed + lounge'],
-  labels: [['Office', '13 × 10 ft', [6.5, .3, 6]], ['Lounge', '', [9.2, .3, 19.2]], ['Bed', '', [9.2, .3, 24.6]]],
+  labels: [['Office', '13 × 10 ft', [6.5, .3, 6]], ['Lounge', '', [10.6, .3, SZ1 - 1.2]], ['Bed', '', [3.8, .3, bedC]]],
 }, (L, F) => {
   const w = win(3, 7);
   run('z', XL, ZN, ZA, [w], IN_);
   windowIn('Office west window', 'Cross-ventilation with the east window.', 'z', XL, w);
-  // office: desk on the north wall, side-lit from the east window
   desk(F, 'n', ZN + T / 2, 5.2, 11.4);
   taskChair(F, 'n', ZN + T / 2, 8.3);
   shelf(F, 'w', XL + T / 2, 7.3, 9.8);
   { const rc = item(F, 'Reading chair', 'Office', 'Second seat for calls and reading.'); B(rc, .9, 2.7, .5, 1.5, .9, 2.7, M.fabric2); B(rc, .7, 1.0, 1.5, 3.2, .9, 2.7, M.fabric2); }
   rug(F, 4.2, 12.4, 3, 8.6);
-  // south room
-  southShell(L, door(8.75, 11.25), win(16.6, 20.6, 0, DOOR), win(8.4, 11.4));
-  sofa(F, 'Loveseat', 'Two-seater facing the balcony door — the lounge corner.', 'e', XM - T / 2, 16.5, 20.5, 2.5);
-  coffee(F, 9.7, 19.9, .7);
-  curtain(L, 'Curtain divider', 'Ceiling-track curtain across the room. Draw it to close the bed off from the lounge corner and the door.', 'x', 21.4, XW + .3, XM - .3, .78);
-  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the stair-cover wall (solid RCC — quiet).', 'e', XM - T / 2, 24.4);
-  wardrobe(F, 'w', XW + T / 2, 24.7, 27.4);
+  // south room: bed west, lounge east by the door
+  southShell(L, door(8.75, 11.25), win(8.6, 12.4, 0, DOOR), { axis: 'x', o: win(2, 5) });
+  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the west wall.', 'w', XL + T / 2, bedC);
+  if (roomForNorthWardrobe) wardrobe(F, 'n', SZ0, 1, 3.8);
+  curtain(L, 'Curtain divider', 'Ceiling-track curtain between the bed and the lounge corner by the door.', 'z', 7.6, SZ0 + .2, SZ1 - .2, .78);
+  sofa(F, 'Loveseat', 'Two-seater against the RCC stair-cover wall.', 'e', XM - T / 2, SZ0 + .3, Math.min(SZ0 + 4.3, SZ1 - .2), 2.5);
+  coffee(F, 9.7, Math.min(SZ1 - .9, SZ0 + 3.6), .65);
   // services
   point('switch', 13.8, 4, fA, 'Office switches', 'Light + fan, latch side of the door.');
   point('socket', 6.4, 1.2, fN, 'Desk power (×2)', 'Dedicated circuit for the workstation, surge-protected.');
@@ -828,21 +897,20 @@ defineLayout('a', {
   point('light', 7.2, 9.6, 5.2, 'Office ceiling light', 'LED panel, neutral white (4000 K) for working.');
   ac('n', ZN + T / 2, 2.6, 'Office AC');
   point('switch', 11.6, 4, fBs, 'South room switches', 'Lounge light, fan, two-way for the bed light.');
-  point('socket', fM, 1, 16.6, 'Lounge socket', 'Side lamp and charging.');
-  point('socket', fM, 2.3, 21.7, 'Bedside socket', 'Phone charging, with USB-C.');
-  point('switch', fM, 2.6, 27.1, 'Bedside switch', 'Two-way for the bed light.');
-  point('light', fM, 4.6, 21.7, 'Reading light', 'Swing-arm wall light over the bed.');
-  point('light', 9.2, 9.6, 18.8, 'Lounge light', 'Warm dimmable LED.');
-  point('light', 9.2, 9.6, 24.4, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
-  ac('s', ZS - T / 2, 11.6, 'Bedroom AC');
+  point('socket', fM, 1, SZ0 + 4.6, 'Lounge socket', 'Side lamp and charging.');
+  point('socket', fW, 2.3, bedC - 2.9, 'Bedside socket', 'Phone charging, with USB-C.');
+  point('light', fW, 4.6, bedC - 2.9, 'Reading light', 'Swing-arm wall light over the bed.');
+  point('light', 10.7, 9.6, (SZ0 + SZ1) / 2, 'Lounge light', 'Warm dimmable LED.');
+  point('light', 3.8, 9.6, bedC, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
+  ac('e', XM - T / 2, (SZ0 + SZ1) / 2 + .6, 'AC');
 });
 
 // ---------- B · living north, bed + desk south ----------
 defineLayout('b', {
-  stats: [['Living', '13 × 10 ft'], ['Bed + office', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
-  note: 'Living room in the north room. South room is bedroom and office together: bed by the door, desk at the south window behind a curtain.',
+  stats: [['Living', '13 × 10 ft'], ['Bed + office', roomSize], ['Bath', '7.7 × 4.3 ft'], ['Balcony', balSize]],
+  note: 'Living room in the north room. South room is bedroom and office together: bed on the west, desk on the east by the balcony door, curtain between.',
   zones: ['Living', 'Bed + desk'],
-  labels: [['Living', '13 × 10 ft', [6.5, .3, 6]], ['Bed', '', [7.8, .3, 19.2]], ['Desk', '', [8.4, .3, 24.6]]],
+  labels: [['Living', '13 × 10 ft', [6.5, .3, 6]], ['Bed', '', [3.8, .3, bedC]], ['Desk', '', [10, .3, SZ1 - 1.2]]],
 }, (L, F) => {
   run('z', XL, ZN, ZA, [], IN_);
   tv(F, 'w', XL + T / 2, 5.5);
@@ -851,12 +919,13 @@ defineLayout('b', {
   shelf(F, 'n', ZN + T / 2, 4, 8);
   rug(F, 3.5, 10.8, 1.6, 7.6);
   // south room
-  southShell(L, door(11.35, 13.75), win(23, 26.6, 0, DOOR), win(11, 13.6));
-  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the balcony-side wall, clear of the door swing.', 'w', XW + T / 2, 19.1);
-  curtain(L, 'Curtain divider', 'Ceiling-track curtain between the bed and the desk — work late without waking anyone.', 'x', 22.1, XW + .3, XM - .3, .78);
-  desk(F, 's', ZS - T / 2, 4.7, 10.5);
-  taskChair(F, 's', ZS - T / 2, 7.6);
-  wardrobe(F, 'e', XM - T / 2, 20, 22);
+  southShell(L, door(11.35, 13.75), win(8.0, 11.0, 0, DOOR), { axis: 'x', o: win(2, 5) });
+  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the west wall.', 'w', XL + T / 2, bedC);
+  if (roomForNorthWardrobe) wardrobe(F, 'n', SZ0, 1, 3.8);
+  curtain(L, 'Curtain divider', 'Ceiling-track curtain between the bed and the desk — work late without waking anyone.', 'z', 7.6, SZ0 + .2, SZ1 - .2, .78);
+  const d0 = SZ0 + 2.5, d1 = Math.max(d0 + 3, SZ1 - .1);
+  desk(F, 'e', XM - T / 2, d0, d1);
+  taskChair(F, 'e', XM - T / 2, (d0 + d1) / 2);
   // services
   point('switch', 10.3, 4, fA, 'Living switches', 'Light, fan, dimmer.');
   point('socket', fW, 1.2, 3.9, 'TV / console power', 'Behind the console, with space for a small UPS.');
@@ -864,23 +933,23 @@ defineLayout('b', {
   point('socket', fM, 1, 8.4, 'Sofa-side socket', 'Side lamp and charging.');
   point('light', 7.2, 9.6, 5.2, 'Living light', 'Warm dimmable LED.');
   ac('n', ZN + T / 2, 10.8, 'Living AC');
-  point('switch', 11, 4, fBs, 'South room switches', 'Bed light (two-way) and fan.');
-  point('socket', fWb, 2.3, 16.5, 'Bedside socket', 'Phone charging, with USB-C.');
-  point('light', fWb, 4.6, 16.5, 'Reading light', 'Swing-arm wall light.');
-  point('socket', 5.8, 1.2, fS, 'Desk power (×2)', 'Dedicated circuit, surge-protected.');
-  point('socket', 9.4, 1.2, fS, 'Desk power (×2)', 'Second double socket.');
-  point('data', 7.6, 1.2, fS, 'Desk CAT6 (×2)', 'Two RJ45 ports home-run to the router.');
-  point('light', 9.2, 9.6, 19, 'Bedroom light', 'Warm dimmable LED (2700 K).');
-  point('light', 9.2, 9.6, 24.8, 'Desk light', 'Neutral-white LED (4000 K).');
-  ac('e', XM - T / 2, 24.8, 'Bedroom AC');
+  point('switch', 10.9, 4, fBs, 'South room switches', 'Bed light (two-way) and fan.');
+  point('socket', fW, 2.3, bedC - 2.9, 'Bedside socket', 'Phone charging, with USB-C.');
+  point('light', fW, 4.6, bedC - 2.9, 'Reading light', 'Swing-arm wall light.');
+  point('socket', fM, 1.2, d0 + .6, 'Desk power (×2)', 'Dedicated circuit, surge-protected.');
+  point('socket', fM, 1.2, d1 - .6, 'Desk power (×2)', 'Second double socket.');
+  point('data', fM, 1.2, (d0 + d1) / 2, 'Desk CAT6 (×2)', 'Two RJ45 ports home-run to the router.');
+  point('light', 3.8, 9.6, bedC, 'Bedroom light', 'Warm dimmable LED (2700 K).');
+  point('light', 10.7, 9.6, (SZ0 + SZ1) / 2, 'Desk light', 'Neutral-white LED (4000 K).');
+  ac('n', SZ0, 4.4, 'AC');
 });
 
 // ---------- C · office + lounge north, bedroom south ----------
 defineLayout('c', {
-  stats: [['Office + lounge', '13 × 10 ft'], ['Bedroom', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
+  stats: [['Office + lounge', '13 × 10 ft'], ['Bedroom', roomSize], ['Bath', '7.7 × 4.3 ft'], ['Balcony', balSize]],
   note: 'North room is office and lounge together. South room is a plain bedroom with the balcony off it.',
   zones: ['Office + lounge', 'Bedroom'],
-  labels: [['Office + lounge', '13 × 10 ft', [6.5, .3, 6.9]], ['Bedroom', '9.5 × 11 ft', [9, .3, 25.9]]],
+  labels: [['Office + lounge', '13 × 10 ft', [6.5, .3, 6.9]], ['Bedroom', roomSize, [5, .3, SZ1 - 1.2]]],
 }, (L, F) => {
   const w = win(2.5, 7);
   run('z', XL, ZN, ZA, [w], IN_);
@@ -891,10 +960,11 @@ defineLayout('c', {
   coffee(F, 5.2, 4.8, .8);
   shelf(F, 'n', ZN + T / 2, .8, 4.6);
   // south room
-  southShell(L, door(8.75, 11.25), win(17.8, 21.6, 0, DOOR), win(7.4, 11.4));
-  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the RCC stair-cover wall.', 'e', XM - T / 2, 22.3);
-  nightstand(F, 'e', XM - T / 2, 18.8); nightstand(F, 'e', XM - T / 2, 25.8);
-  wardrobe(F, 'w', XW + T / 2, 23.6, 27.4);
+  const wz0 = SZ0 + 4.4, wz1 = SZ1 - .4;
+  southShell(L, door(8.75, 11.25), win(3, 6.8, 0, DOOR), wz1 - wz0 >= 1.5 ? { axis: 'z', o: win(wz0, wz1) } : null);
+  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the RCC stair-cover wall.', 'e', XM - T / 2, bedC);
+  if (bedC - 2.5 - 1.4 >= SZ0) nightstand(F, 'e', XM - T / 2, bedC - 3.25);
+  wardrobe(F, 'w', XL + T / 2, SZ0 + .2, SZ0 + 4.2);
   // services
   point('switch', 13.8, 4, fA, 'Room switches', 'Office light, lounge light, fan.');
   point('socket', 8.8, 1.2, fN, 'Desk power (×2)', 'Dedicated circuit, surge-protected.');
@@ -905,12 +975,10 @@ defineLayout('c', {
   point('light', 4.5, 9.6, 5.5, 'Lounge light', 'Warm dimmable LED.');
   ac('n', ZN + T / 2, 2.7, 'AC');
   point('switch', 11.6, 4, fBs, 'Bedroom switches', 'Light (two-way), fan.');
-  point('socket', fM, 2.3, 18.2, 'Bedside socket', 'With USB-C.');
-  point('socket', fM, 2.3, 26.4, 'Bedside socket', 'With USB-C.');
-  point('light', fM, 4.6, 18.2, 'Reading light', 'Swing-arm wall light.');
-  point('light', fM, 4.6, 26.4, 'Reading light', 'Swing-arm wall light.');
-  point('light', 9.2, 9.6, 22, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
-  ac('s', ZS - T / 2, 9.4, 'Bedroom AC');
+  point('socket', fM, 2.3, bedC - 2.9, 'Bedside socket', 'With USB-C.');
+  point('light', fM, 4.6, bedC - 2.9, 'Reading light', 'Swing-arm wall light.');
+  point('light', 7, 9.6, (SZ0 + SZ1) / 2, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
+  ac('n', SZ0, 4.4, 'Bedroom AC');
 });
 
 // ---------- room labels (HTML) ----------
@@ -918,7 +986,7 @@ const labelsEl = document.getElementById('labels');
 const ROOMS = [
   ['Bath', '7.7 × 4.3 ft', [4.4, .3, 13.5]],
   ['Lobby', '', [11.3, .3, 13.5]],
-  ['Balcony', '', [2.1, .3, 23.6]],
+  ['Balcony', `${BD} ft`, [7.4, .3, (ZBAL + 27.5) / 2]],
   ['Covered terrace', '', [19.5, .3, 11]],
   ['Stair + tank', 'RCC', [18, .3, 21.5]],
   ...Object.values(LAYOUTS).flatMap(L => L.labels.map(l => [...l, L.key])),
@@ -945,14 +1013,14 @@ const VIEWS = isSmall ? {
   dollhouse: [[-22, 52, 54], [12, 0, 13.5], false, true],
   plan: [[12.6, 86, 14.1], [12.6, 0, 14], false, true],
   left: [[6.5, 30, 27], [6.5, 1, 5], false, true],
-  right: [[-14, 30, 35], [8, 1, 21.5], false, true],
+  right: [[7, 36, 48], [7, 1, 21], false, true],
   bath: [[5, 40, 33], [5, 0, 13.4], false, true],
 } : {
   exterior: [[-6, 26, 78], [14, -7, 12], true, false],
   dollhouse: [[-17, 38, 44], [12, 0, 13.5], false, true],
   plan: [[12.6, 60, 14.02], [12.6, 0, 14], false, true],
   left: [[6.5, 22, 23], [6.5, 1, 5], false, true],
-  right: [[-11, 22, 31], [8.5, 1, 21.5], false, true],
+  right: [[7, 26, 40], [7, 1, 21], false, true],
   bath: [[5, 30, 26], [5, 0, 13.4], false, true],
 };
 const roofBox = document.querySelector('[data-layer=roof]'), cutBox = document.getElementById('cut');
@@ -1006,6 +1074,102 @@ function setLayout(key) {
 }
 document.querySelectorAll('#layouts button').forEach(b => b.addEventListener('click', () => setLayout(b.dataset.layout)));
 curtainBox.addEventListener('change', () => { const L = LAYOUTS[layout]; L.curtainClosed = curtainBox.checked; L.curtains.forEach(c => c.set(curtainBox.checked ? 1 : .22)); if (selected) helper.setFromObject(selected); });
+
+// ---------- paint ----------
+// RAL Classic shades (standard codes; hex values are the usual sRGB approximations).
+const RAL = {
+  '9010': ['Pure white', '#F1EDE1'], '9016': ['Traffic white', '#F1F0EA'], '9001': ['Cream', '#E9E0D2'],
+  '1013': ['Oyster white', '#E3D9C6'], '1015': ['Light ivory', '#E6D2B5'], '1014': ['Ivory', '#DDC49A'],
+  '1001': ['Beige', '#D0B084'], '1002': ['Sand yellow', '#D2AA6D'], '1034': ['Pastel yellow', '#EFA94A'],
+  '1017': ['Saffron yellow', '#F6A950'], '3012': ['Beige red', '#C6846D'], '8023': ['Orange brown', '#A65E2E'],
+  '3009': ['Oxide red', '#6D342D'], '8017': ['Chocolate brown', '#45322E'], '6019': ['Pastel green', '#B9CEAC'],
+  '6021': ['Pale green', '#89AC76'], '6011': ['Reseda green', '#587246'], '5024': ['Pastel blue', '#5D9B9B'],
+  '5014': ['Pigeon blue', '#637D96'], '7044': ['Silk grey', '#CAC4B0'], '7035': ['Light grey', '#CBD0CC'],
+  '7032': ['Pebble grey', '#B5B0A1'], '1019': ['Grey beige', '#A48F7A'], '7016': ['Anthracite grey', '#383E42'],
+  '9005': ['Jet black', '#0A0A0A'],
+};
+const ral = c => ({ id: c, label: `RAL ${c} · ${RAL[c][0]}`, hex: RAL[c][1] });
+const SY_ROOF = { green: ['Green', '#3f6b4a'], blue: ['Blue', '#2f5d8a'], maroon: ['Maroon', '#7a2e2e'], orange: ['Orange', '#c8643a'], zinc: ['Zinc black', '#33383d'] };
+const syRoof = k => ({ id: k, label: `SY EPS roof · ${SY_ROOF[k][0]}`, hex: SY_ROOF[k][1] });
+const WALL_SET = ['9010', '9001', '1013', '1015', '1014', '1001', '1002', '1034', '1017', '3012', '8023', '6019', '6021', '5024', '5014', '7044', '7035', '7032', '1019'].map(ral);
+// roof sheet texture recoloured by material colour, so it needs a light, neutral base
+const roofNeutral = canvasTex(256, (g, s) => {
+  g.fillStyle = '#d4d8dc'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 4; i++) { g.fillStyle = '#ffffff'; g.fillRect(i * s / 4, 0, 6, s); g.fillStyle = '#8f979e'; g.fillRect(i * s / 4 + 6, 0, 2, s); }
+});
+roofNeutral.center.set(.5, .5); roofNeutral.rotation = Math.PI / 2; roofNeutral.repeat.set(7, 1);
+roofMat.map = roofNeutral; roofMat.needsUpdate = true;
+const SURFACES = [
+  { key: 'body', name: 'House walls', note: 'Both existing floors and the RCC stair cover', opts: WALL_SET, mats: [M.building, RCC], def: '1013' },
+  { key: 'trim', name: 'Bands & parapets', note: 'Floor bands, plinth, parapets, veranda column', opts: ['9010', '9001', '1015', '1014', '7044', '7035', '7032', '1019', '3012', '8023', '3009', '8017', '6011', '5014', '7016'].map(ral), mats: [M.parapet], def: '9001' },
+  { key: 'top', name: 'Rooftop rooms', note: 'New EPS walls (SY flat panels come in ivory, white or maroon)', opts: WALL_SET.concat(['3009'].map(ral)), mats: [M.wall], def: '9010' },
+  { key: 'frames', name: 'Window & door frames', note: 'UPVC / aluminium profile colour', opts: ['9016', '9001', '7035', '7016', '8017', '9005'].map(ral), mats: [M.frame], def: '7016' },
+  { key: 'roof', name: 'Roof sheets', note: 'SY Panel EPS roof panel colours', opts: Object.keys(SY_ROOF).map(syRoof), mats: [roofMat], def: 'zinc' },
+];
+const PRESETS = [
+  ['Ivory + oxide red', { body: '1015', trim: '3009', top: '1015', frames: '8017', roof: 'maroon' }],
+  ['Cream + anthracite', { body: '9001', trim: '7016', top: '9001', frames: '7016', roof: 'zinc' }],
+  ['Sand + chocolate', { body: '1002', trim: '8017', top: '1015', frames: '8017', roof: 'maroon' }],
+  ['Sage + white', { body: '6019', trim: '9010', top: '9010', frames: '9016', roof: 'green' }],
+  ['Silk grey + blue', { body: '7044', trim: '5014', top: '9010', frames: '7016', roof: 'blue' }],
+  ['Terracotta + cream', { body: '3012', trim: '9001', top: '9001', frames: '8017', roof: 'orange' }],
+];
+const paint = Object.fromEntries(SURFACES.map(S => [S.key, S.def]));
+try { Object.assign(paint, JSON.parse(localStorage.getItem('rooftop-paint') || '{}')); } catch {}
+const optOf = (S, id) => S.opts.find(o => o.id === id) || S.opts.find(o => o.id === S.def);
+function applyPaint() {
+  for (const S of SURFACES) {
+    const o = optOf(S, paint[S.key]); paint[S.key] = o.id;
+    for (const m of S.mats) m.color.set(o.hex);
+    const box = document.querySelector(`[data-surface=${S.key}]`);
+    box.querySelector('h3 span').textContent = o.label;
+    box.querySelectorAll('.swatch').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === o.id));
+  }
+  document.querySelectorAll('.preset').forEach((b, i) => b.setAttribute('aria-pressed', SURFACES.every(S => PRESETS[i][1][S.key] === paint[S.key])));
+  try { localStorage.setItem('rooftop-paint', JSON.stringify(paint)); } catch {}
+}
+{
+  const host = document.getElementById('surfaces');
+  for (const S of SURFACES) {
+    const d = document.createElement('div'); d.className = 'surface'; d.dataset.surface = S.key;
+    d.innerHTML = `<h3>${S.name}<span></span></h3><p>${S.note}</p><div class="sw-grid"></div>`;
+    const grid = d.querySelector('.sw-grid');
+    for (const o of S.opts) {
+      const b = document.createElement('button'); b.className = 'swatch'; b.dataset.id = o.id;
+      b.style.background = o.hex; b.title = o.label; b.setAttribute('aria-label', o.label);
+      b.addEventListener('click', () => { paint[S.key] = o.id; applyPaint(); });
+      grid.appendChild(b);
+    }
+    host.appendChild(d);
+  }
+  const ph = document.getElementById('presets');
+  for (const [name, set] of PRESETS) {
+    const b = document.createElement('button'); b.className = 'preset';
+    b.innerHTML = `<span class="chips">${SURFACES.map(S => `<i style="background:${optOf(S, set[S.key]).hex}"></i>`).join('')}</span>${name}`;
+    b.addEventListener('click', () => { Object.assign(paint, set); applyPaint(); });
+    ph.appendChild(b);
+  }
+  document.getElementById('paintReset').addEventListener('click', () => { for (const S of SURFACES) paint[S.key] = S.def; applyPaint(); });
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+    document.querySelectorAll('[data-pane]').forEach(p => { p.hidden = p.dataset.pane !== b.dataset.tab; });
+  }));
+  applyPaint();
+}
+
+// ---------- balcony depth (rebuilds the scene via reload) ----------
+{
+  const seg = document.getElementById('balSeg');
+  for (const v of BAL_OPTS) {
+    const b = document.createElement('button'); b.textContent = v + ' ft'; b.setAttribute('aria-pressed', v === BD);
+    b.addEventListener('click', () => {
+      if (v === BD) return;
+      try { localStorage.setItem('rooftop-balcony', v); } catch {}
+      const u = new URL(location.href); u.searchParams.set('balcony', v); location.replace(u.toString());
+    });
+    seg.appendChild(b);
+  }
+}
 
 // ---------- layer toggles ----------
 document.querySelectorAll('[data-layer]').forEach(i => i.addEventListener('change', () => { G[i.dataset.layer].visible = i.checked; if (!i.checked) clearSelection(); }));
@@ -1074,6 +1238,7 @@ renderer.setAnimationLoop(now => {
 });
 setLayout(location.hash.slice(1).toLowerCase());
 setView('dollhouse', true);
+window.rooftop = { camera, orbit }; // handy for console tinkering
 requestAnimationFrame(() => document.getElementById('loader').classList.add('done'));
 setTimeout(() => { document.getElementById('hint').style.opacity = 0; }, 9000);
 </script>
