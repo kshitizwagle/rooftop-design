@@ -180,6 +180,7 @@ details li{margin:3px 0}
   <label class="row"><span class="lbl">Plumbing &amp; drainage</span><input type="checkbox" data-layer="plumbing" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Water tank (proposed)</span><input type="checkbox" data-layer="tank" checked><span class="sw"></span></label>
   <div class="row" style="cursor:default"><span class="lbl">Balcony depth</span><span class="seg" id="balSeg"></span></div>
+  <label class="row"><span class="lbl">False ceilings + fans</span><input type="checkbox" id="ceilToggle" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Dimensions</span><input type="checkbox" id="dimsToggle" checked><span class="sw"></span></label>
   <label class="row"><span class="lbl">Room labels</span><input type="checkbox" id="labelsToggle" checked><span class="sw"></span></label>
   <hr>
@@ -211,6 +212,7 @@ details li{margin:3px 0}
   <button data-view="left">Office</button>
   <button data-view="right">Living</button>
   <button data-view="bath">Bath</button>
+  <button data-view="ceiling">Ceilings</button>
 </nav>
 
 <button id="compass" aria-label="Point north up">
@@ -531,7 +533,8 @@ function run(axis, fixed, from, to, ops = [], ext = [T / 2, T / 2], h = H, mat =
   }
   if (e > c) push(c, e, 0, h);
 }
-const DOOR = 7, SILL = 3, HEAD = 7.5, MH = 8.5; // MH = stair-cover wall height
+const DOOR = 7, SILL = 3, HEAD = 7.5, MH = 8.5;
+const CEIL = 9, CEIL_BATH = 8.5; // MH = stair-cover wall height
 const door = (a, b) => ({ a, b, y0: 0, y1: DOOR }), win = (a, b, y0 = SILL, y1 = HEAD) => ({ a, b, y0, y1 });
 const IN_ = [-T / 2, -T / 2]; // z-runs sit between x-runs
 const RCC = std('#c9c4bb', { roughness: .95 });
@@ -695,6 +698,47 @@ const F = G.furniture;
   B(sh, XL + T / 2, 1.6, 6.45, 6.55, 12.45, 12.55, M.fitting);
 }
 
+// ---------- false ceilings, fans, plenum vents ----------
+const ceilMat = std('#fbfaf7', { transparent: true, opacity: .55, depthWrite: false, side: THREE.DoubleSide, roughness: .9 });
+const ceilings = new THREE.Group(); upper.add(ceilings);
+function ceiling(name, desc, x0, x1, z0, z1, y) { const g = item(ceilings, name, 'Ceiling', desc); B(g, x0, x1, y, y + .08, z0, z1, ceilMat, { cast: false }); return g; }
+ceiling('False ceiling — north room', `Flat ceiling at 9'-0" under the gable roof. The space above (about 1 ft at the walls, 3 ft at the ridge) is an insulating air layer between you and the hot roof sheet.`, XL + T / 2, XM - T / 2, ZN + T / 2, ZA - T / 2, CEIL);
+ceiling('False ceiling — lobby', `9'-0", in line with the rooms.`, 8.5 + T / 2, XM - T / 2, ZA + T / 2, ZB2 - T / 2, CEIL);
+ceiling('False ceiling — bath', `8'-6", moisture-resistant board. Lower than the rooms to give the exhaust fan less air to clear.`, XL + T / 2, 8.5 - T / 2, ZA + T / 2, ZB2 - T / 2, CEIL_BATH);
+ceiling('False ceiling — south room', `Flat ceiling at 9'-0". Cosier in winter than the open gable, still tall enough for a ceiling fan.`, XL + T / 2, XM - T / 2, ZB2 + T / 2, ZBAL - T / 2, CEIL);
+const fanMat = std('#f2efe9', { roughness: .5 });
+function fan(x, z, name) {
+  const g = item(ceilings, name, 'Ceiling fan', `48" ceiling fan, blades about 8'-4" above the floor — above the 7 ft minimum for head clearance. Use it in summer; reverse it on low in winter to push warm air down.`);
+  C(g, x, 8.4, CEIL, z, .05, M.steel, 8); C(g, x, 8.25, 8.45, z, .35, fanMat, 20);
+  for (let i = 0; i < 3; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(1.9, .04, .45), fanMat); b.position.set(x + Math.cos(i * 2.094) * 1.15, 8.33, z + Math.sin(i * 2.094) * 1.15); b.rotation.y = -i * 2.094; g.add(b); }
+}
+fan(7.25, 6.4, 'Ceiling fan — north room'); fan(7.25, (ZB2 + ZBAL) / 2 + .4, 'Ceiling fan — south room');
+// louvred vents high in each gable: ventilate the ceiling void in summer, close them in winter
+for (const [z, out] of [[ZN, -1], [ZBAL, 1]]) {
+  const g = item(upper, 'Plenum vent', 'Ventilation', 'Louvred vent high in the gable, into the void above the false ceiling. Open in summer so roof heat escapes before it reaches the rooms; close the shutter in winter to keep the warm layer in.');
+  const zf = z + out * (T / 2 + .03);
+  B(g, RIDGE_X - 1.2, RIDGE_X + 1.2, 10.6, 10.75, zf - .05, zf + .05, M.frame); B(g, RIDGE_X - 1.2, RIDGE_X + 1.2, 11.85, 12, zf - .05, zf + .05, M.frame);
+  for (let y = 10.85; y < 11.8; y += .22) B(g, RIDGE_X - 1.1, RIDGE_X + 1.1, y, y + .06, zf - .08, zf + .08, M.frame);
+}
+// bath wall tiles to 7 ft (6'-6" on the west wall under the vent)
+{
+  const tile = clip(std('#ffffff', { map: tex(tileTex, 2, 2), roughness: .35 }));
+  const t = item(G.furniture, 'Wall tiles', 'Bathroom', 'Glazed wall tile to 7 ft on all bath walls, full height in the shower, over cement board and a waterproof membrane — the EPS panel itself never sees water.');
+  const x0 = XL + T / 2, x1 = 8.5 - T / 2, z0 = ZA + T / 2, z1 = ZB2 - T / 2;
+  B(t, x0, x0 + .03, .08, 6.5, z0, z1, tile, { cast: false });
+  B(t, x0, x1, .08, 7, z0, z0 + .03, tile, { cast: false }); B(t, x0, x1, .08, 7, z1 - .03, z1, tile, { cast: false });
+  B(t, x1 - .03, x1, .08, 7, z0, O.bathDoor.a, tile, { cast: false }); B(t, x1 - .03, x1, .08, 7, O.bathDoor.b, z1, tile, { cast: false });
+  B(t, x0, 3, 6.5, CEIL_BATH, z0, z0 + .03, tile, { cast: false }); B(t, x0, x0 + .03, 6.5, CEIL_BATH, z0, 12.9, tile, { cast: false });
+}
+// shoes off at the stair door, before the lobby
+{
+  const sc = item(G.furniture, 'Shoe cabinet + bench', 'Lobby', 'Shoe cabinet with a seat on top, beside the stair door under the shed. Shoes come off here, so grit from the terrace and the stairs stays out of the rooms.');
+  B(sc, 14.45, 16.15, .03, 1.5, 14.75, 16.05, M.walnut); B(sc, 14.45, 16.15, 1.5, 1.6, 14.75, 16.05, M.oak);
+  const dm = item(G.furniture, 'Door mats', 'Lobby', 'Coir mats at the stair door and lobby entrance.');
+  B(dm, 16.5, 19.1, .03, .07, 15.1, 16.0, std('#8a6a48', { roughness: 1 }), { cast: false });
+  B(dm, XM - .2, XM + 1.4, .03, .07, 11.2, 13.8, std('#8a6a48', { roughness: 1 }), { cast: false });
+}
+
 // ---------- service points ----------
 const SERV = {
   switch: { color: '#f2b632', cat: 'Switch' }, socket: { color: '#e2554f', cat: 'Power socket' },
@@ -703,7 +747,11 @@ const SERV = {
 };
 const markerGeo = new THREE.SphereGeometry(.2, 20, 14), ringGeo = new THREE.TorusGeometry(.32, .05, 8, 32);
 const markerMats = Object.fromEntries(Object.entries(SERV).map(([k, v]) => [k, std(v.color, { emissive: v.color, emissiveIntensity: .35, roughness: .4 })]));
+// false ceiling: 9'-0" in the rooms and lobby, 8'-6" in the bath (see ceiling block below)
+const inBath = (x, z) => x < 8.5 && z > ZA && z < ZB2;
+const ceilAt = (x, z) => inBath(x, z) ? CEIL_BATH : CEIL;
 function point(kind, x, y, z, name, desc) {
+  if (kind === 'light' && y > 8.4 && x < XM + .5) y = ceilAt(x, z) - .15; // ceiling lights sit on the false ceiling
   const g = item(kind === 'water' ? G.plumbing : ctx ? ctx.elec : G.electrical, name, SERV[kind].cat, desc);
   const s = new THREE.Mesh(markerGeo, markerMats[kind]); s.position.set(x, y, z); g.add(s);
   if (kind === 'light') { const r = new THREE.Mesh(ringGeo, markerMats.light); r.rotation.x = Math.PI / 2; r.position.set(x, y, z); g.add(r); }
@@ -717,10 +765,10 @@ const fW = XL + T / 2 + IN, fM = XM - T / 2 - IN;
 /** Wall-split AC indoor unit on a wall face: wall 'n' | 's' | 'e' | 'w', face = wall face coordinate, c = centre along the wall. */
 function ac(wall, face, c, name) {
   const g = item(ctx ? ctx.elec : G.electrical, name, 'AC / ventilation', 'Wall-split inverter AC on its own circuit. Size it with the installer (~1 ton for one of these rooms under an insulated roof).');
-  if (wall === 'n') B(g, c - 1.6, c + 1.6, 8, 9, face, face + .8, M.acUnit);
-  if (wall === 's') B(g, c - 1.6, c + 1.6, 8, 9, face - .8, face, M.acUnit);
-  if (wall === 'w') B(g, face, face + .8, 8, 9, c - 1.6, c + 1.6, M.acUnit);
-  if (wall === 'e') B(g, face - .8, face, 8, 9, c - 1.6, c + 1.6, M.acUnit);
+  if (wall === 'n') B(g, c - 1.6, c + 1.6, 7.6, 8.6, face, face + .8, M.acUnit);
+  if (wall === 's') B(g, c - 1.6, c + 1.6, 7.6, 8.6, face - .8, face, M.acUnit);
+  if (wall === 'w') B(g, face, face + .8, 7.6, 8.6, c - 1.6, c + 1.6, M.acUnit);
+  if (wall === 'e') B(g, face - .8, face, 7.6, 8.6, c - 1.6, c + 1.6, M.acUnit);
   high.push(g);
 }
 // bath + lobby (shared)
@@ -767,9 +815,9 @@ function curtain(L, name, desc, axis, at, from, to, t = .8) {
   const g = item(L.furn, name, 'Curtain', desc);
   const mesh = new THREE.Mesh(new THREE.BufferGeometry(), curtainMat);
   mesh.castShadow = mesh.receiveShadow = true; g.add(mesh);
-  const rail = axis === 'z' ? B(g, at - .07, at + .07, 9.6, 9.72, from - .1, to + .1, M.steel) : B(g, from - .1, to + .1, 9.6, 9.72, at - .07, at + .07, M.steel);
+  const rail = axis === 'z' ? B(g, at - .07, at + .07, 8.88, 9, from - .1, to + .1, M.steel) : B(g, from - .1, to + .1, 8.88, 9, at - .07, at + .07, M.steel);
   high.push(rail);
-  const N = 120, Y0 = .3, Y1 = 9.55;
+  const N = 120, Y0 = .3, Y1 = 8.85;
   function set(k) {
     const w = (to - from) * Math.max(.12, k), folds = (to - from) / .55, amp = .1 + .22 * (1 - k);
     const pos = [], idx = [];
@@ -831,7 +879,10 @@ function taskChair(F, wall, face, c, v = 3.6) {
   C(g, p[0], .07, 1.6, p[1], .08, M.steel, 12); C(g, p[0], .07, .25, p[1], .9, M.black, 5, .9);
   bx(g, c - .85, c + .85, 1.55, 1.85, v - .85, v + .85, M.black);
   bx(g, c - .8, c + .8, 2.0, 4.3, v + .6, v + .85, M.black);
+  const mat = item(F, 'Chair mat', 'Office', 'Clear chair mat under the rolling chair — the castors run on this, not the floor, 6+ hours a day.');
+  bx(mat, c - 2, c + 2, .07, .085, v - 2.2, v + 1.6, chairMatMat, { cast: false });
 }
+const chairMatMat = new THREE.MeshStandardMaterial({ color: '#dfe6ea', transparent: true, opacity: .45, roughness: .2, depthWrite: false });
 function sofa(F, name, desc, wall, face, u0, u1, d = 2.7) {
   const g = item(F, name, 'Lounge', desc), bx = frame(wall, face);
   bx(g, u0, u1, .4, 1.5, 0, d, M.fabric); bx(g, u0, u1, 1.5, 3.0, 0, .75, M.fabric);
@@ -876,6 +927,8 @@ function southShell(L, doorA, balc, extra) {
   B(g, mid - .1, balc.b - .15, .1, DOOR - .15, ZBAL + .08, ZBAL + .12, M.glass, { cast: false });
   B(g, mid - .05, mid + .05, .1, DOOR - .15, ZBAL - .2, ZBAL + .2, M.frame);
   if (extra) windowIn(extra.axis === 'x' ? 'South window' : 'West window', extra.axis === 'x' ? 'South-facing UPVC window onto the balcony.' : 'West-facing UPVC window.', extra.axis, extra.axis === 'x' ? ZBAL : XL, extra.o);
+  const k = item(L.open, 'Raised threshold', 'Balcony', 'Raised sill under the balcony door, with the balcony floor falling away from it, to stop monsoon rain blowing in.');
+  B(k, balc.a, balc.b, 0, .25, ZBAL - .25, ZBAL + .45, M.parapet);
   balconySet(L.furn);
 }
 const bedC = SZ1 - 2.6;               // bed pushed to the balcony side, 5 ft wide
@@ -1060,6 +1113,7 @@ const VIEWS = isSmall ? {
   left: [[6.5, 30, 27], [6.5, 1, 5], false, true],
   right: [[7, 36, 48], [7, 1, 21], false, true],
   bath: [[5, 40, 33], [5, 0, 13.4], false, true],
+  ceiling: [[-18, 40, 44], [7, 4, 13.5], false, false],
 } : {
   exterior: [[-6, 26, 78], [14, -7, 12], true, false],
   dollhouse: [[-17, 38, 44], [12, 0, 13.5], false, true],
@@ -1067,6 +1121,7 @@ const VIEWS = isSmall ? {
   left: [[6.5, 22, 23], [6.5, 1, 5], false, true],
   right: [[7, 26, 40], [7, 1, 21], false, true],
   bath: [[5, 30, 26], [5, 0, 13.4], false, true],
+  ceiling: [[-14, 30, 34], [7, 4, 13.5], false, false],
 };
 const roofBox = document.querySelector('[data-layer=roof]'), cutBox = document.getElementById('cut');
 function setRoof(on) { G.roof.visible = roofBox.checked = on; }
@@ -1222,6 +1277,7 @@ function applyPaint() {
 document.querySelectorAll('[data-layer]').forEach(i => i.addEventListener('change', () => { G[i.dataset.layer].visible = i.checked; if (!i.checked) clearSelection(); }));
 cutBox.addEventListener('change', () => setCut(cutBox.checked));
 document.getElementById('labelsToggle').addEventListener('change', e => { labelsOn = e.target.checked; });
+document.getElementById('ceilToggle').addEventListener('change', e => { ceilings.visible = e.target.checked; });
 document.getElementById('dimsToggle').addEventListener('change', e => { dimsOn = e.target.checked; });
 const panel = document.getElementById('panel'), layersBtn = document.getElementById('layersBtn');
 const togglePanel = open => { panel.classList.toggle('open', open); layersBtn.setAttribute('aria-expanded', open); };
