@@ -14,6 +14,7 @@ An interactive, mobile-friendly Three.js model of the rooftop addition on the ex
   - **B · Living + bed/desk**: living room north; bedroom plus a south-facing desk behind a curtain south
   - **C · Office/lounge + bedroom**: office and lounge share the north room; plain bedroom south
 - Curtain toggle to see the studio open or closed off
+- North compass (bottom right): the needle shows where north is; tap it to turn north up
 - Full 3D orbit, zoom and pan on desktop and mobile, with smooth camera moves
 - Views: Exterior, Dollhouse (walls cut at 4.5 ft), Plan, and Office / Living / Bath close-ups
 - Layers for roof, walls, furniture, electrical & data, plumbing, room labels and the proposed water tank
