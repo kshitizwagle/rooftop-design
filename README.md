@@ -1,6 +1,6 @@
 # Rooftop Design – 3D Renovation Concept
 
-An interactive, mobile-friendly Three.js model of the rooftop addition on the existing house at plot 268 (Tikathali). The footprint follows the approved ground-floor drawing: about 26'3" × 27', 690 sq ft of roof slab.
+An interactive, mobile-friendly Three.js model of the rooftop addition on the existing house at plot 268 (Tikathali). The footprint follows the approved ground-floor drawing: about 25'3" × 28' (NW room 13 × 10, NE room 10 × 10, SW room 13 × 11), roughly 690 sq ft of roof slab.
 
 **The plan**
 - The brick room with the jasta roof at the south-west comes down.

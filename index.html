@@ -156,7 +156,7 @@ details li{margin:3px 0}
   <details>
     <summary>Assumptions</summary>
     <ul>
-      <li>Footprint from the approved drawing (plot 268): about 26'3" × 27', 690 sq ft. The brick room with the jasta roof at the south-west is demolished.</li>
+      <li>Footprint from the approved drawing (plot 268): about 25'3" × 28', roughly 690 sq ft. The brick room with the jasta roof at the south-west is demolished.</li>
       <li>New rooms, bath and balcony use the west half. New walls sit on the existing wall lines; the bath sits over the existing toilet so it drains into the same stack.</li>
       <li>The stair gets an RCC cover with the 1,000 L tank on its slab.</li>
       <li>The east half is a covered terrace under a jasta shed — salvaged sheets from the old room first, new sheets for the rest — so the leaking slab is fully covered.</li>
@@ -363,9 +363,10 @@ function item(parent, name, cat, desc) {
 
 // ---------- existing house + roof slab (from the approved drawing, plot 268) ----------
 // Plan axes: +x = east, +z = south. Origin = north-west outer corner. 1 unit = 1 ft.
-// Existing 9" wall centre-lines: x 0.375 / 14.125 / 25.875, z 0.375 / 10.125 / 14.875 / 26.625.
-const XL = 0.375, XM = 14.125, XE = 25.875, XS = 21.875;   // west wall, middle wall, east wall, stair east wall
-const ZN = 0.375, ZA = 10.125, ZB2 = 14.875, ZS = 26.625;  // north wall, bed|toilet, toilet|M.bed, south wall
+// Existing 9" wall centre-lines: x 0.375 / 14.125 / 24.875, z 0.375 / 11.125 / 15.875 / 27.625.
+// Rooms: NW bedroom 13 × 10, NE shop 10 × 10, SW master bedroom 13 × 11, toilet 4 ft deep.
+const XL = 0.375, XM = 14.125, XE = 24.875, XS = 21.875;   // west wall, middle wall, east wall, stair east wall
+const ZN = 0.375, ZA = 11.125, ZB2 = 15.875, ZS = 27.625;  // north wall, bed|toilet, toilet|M.bed, south wall
 const XW = 4.125;                                           // new: balcony | south room
 function lshape(parent, pts, y0, y1, mat, cast = true) {
   const sh = new THREE.Shape(pts.map(([x, z]) => new THREE.Vector2(x, z)));
@@ -373,8 +374,8 @@ function lshape(parent, pts, y0, y1, mat, cast = true) {
   m.rotation.x = Math.PI / 2; m.position.y = y1; m.castShadow = cast; m.receiveShadow = true;
   parent.add(m); return m;
 }
-const SLAB = [[0, 0], [26.25, 0], [26.25, 22.25], [22.25, 22.25], [22.25, 27], [0, 27]];
-const HOUSE = [[0, 0], [26.25, 0], [26.25, ZA - .375], [XS + .375, ZA - .375], [XS + .375, 27], [0, 27]];
+const SLAB = [[0, 0], [25.25, 0], [25.25, 23.25], [22.25, 23.25], [22.25, 28], [0, 28]];
+const HOUSE = [[0, 0], [25.25, 0], [25.25, ZA - .375], [XS + .375, ZA - .375], [XS + .375, 28], [0, 28]];
 const ground = new THREE.Mesh(new THREE.CircleGeometry(90, 48), std('#d9d2c4', { roughness: 1 }));
 ground.rotation.x = -Math.PI / 2; ground.position.y = -23.6; ground.receiveShadow = true; G.site.add(ground);
 // two existing storeys (ground + first floor, same plan), 10 ft floor height, 0.8 ft slabs, 2 ft plinth
@@ -385,20 +386,20 @@ for (let f = 0; f < 2; f++) {
   const top = -0.8 - f * FL; // underside of the slab above this floor
   lshape(house, HOUSE, top - 10, top, M.building);
   if (f === 0) lshape(house, SLAB, top - 10.8, top - 10, M.slab); // first-floor slab band
-  for (const [x0, x1, z0, z1] of [[3, 9, -.06, 0], [17, 23, -.06, 0], [-.06, 0, 2.5, 7.5], [-.06, 0, 17, 23], [4, 10, 27, 27.06], [16, 18.5, 27, 27.06]])
+  for (const [x0, x1, z0, z1] of [[3, 9, -.06, 0], [17, 23, -.06, 0], [-.06, 0, 2.5, 7.5], [-.06, 0, 18, 24], [4, 10, 28, 28.06], [16, 18.5, 28, 28.06]])
     B(house, x0, x1, top - 6.5, top - 2, z0, z1, darkGlass, { cast: false });
 }
 lshape(house, HOUSE, -23.6, -21.6, M.parapet); // plinth
-B(house, 25.7, 26.2, -21.6, -0.8, 21.7, 22.2, M.parapet); // veranda corner column, both floors
+B(house, 24.7, 25.2, -21.6, -0.8, 22.7, 23.2, M.parapet); // veranda corner column, both floors
 const slab = item(G.site, 'Existing RCC roof slab', 'Structure', 'About 690 sq ft (building area on the drawing: 689.75 sq ft). It leaks in places, so after this work every part of it sits under a new roof or the jasta shed.');
 lshape(slab, SLAB, -0.8, 0, M.slab);
 const terr = item(G.site, 'Terrace floor', 'Finish', 'Existing slab top. Clean, patch the cracks and apply a waterproof coat before the new roofs go on.');
 lshape(terr, SLAB, 0, .03, std('#fff', { map: tex(deckTex, 6, 6), roughness: .9 }), false);
 // parapets only where no new wall sits on the edge
 const par = item(G.site, 'Parapet', 'Structure', 'Existing 3 ft parapet on the open edges.');
-B(par, XM + .2, 26.25, 0, 3, 0, .5, M.parapet);           // north, east half
-B(par, 25.75, 26.25, 0, 3, 0, 22.25, M.parapet);           // east
-B(par, 22.25, 26.25, 0, 3, 21.75, 22.25, M.parapet);       // notch
+B(par, XM + .2, 25.25, 0, 3, 0, .5, M.parapet);           // north, east half
+B(par, 24.75, 25.25, 0, 3, 0, 23.25, M.parapet);           // east
+B(par, 22.25, 25.25, 0, 3, 22.75, 23.25, M.parapet);       // notch
 function plant(parent, x, z, s = 1) {
   C(parent, x, .05, .05 + 1.3 * s, z, .55 * s, M.pot, 20, .42 * s);
   for (let i = 0; i < 4; i++) {
@@ -407,24 +408,24 @@ function plant(parent, x, z, s = 1) {
     l.castShadow = true; parent.add(l);
   }
 }
-plant(G.site, 25, 1.3, 1.1); plant(G.site, 25, 20.9, 1); plant(G.site, 23.4, 1.3, .8);
+plant(G.site, 24, 1.3, 1.1); plant(G.site, 24, 21.9, 1); plant(G.site, 22.4, 1.3, .8);
 // existing stairwell under the new RCC cover
 {
   const sw = item(G.site, 'Existing stair (opening)', 'Structure', 'Top of the existing dog-leg stair. It stays as it is; the new RCC cover goes over it.');
-  B(sw, 14.6, 21.4, .03, .035, 18.6, 26.2, std('#2a2e33', { roughness: .9 }), { cast: false });
-  for (let i = 0; i < 6; i++) B(sw, 14.6, 17.9, .035, .04 + i * .002, 18.8 + i * 1.2, 19.6 + i * 1.2, std('#5b6168', { roughness: .9 }), { cast: false });
-  B(sw, 14.5, 21.5, 0, 3.2, 18.45, 18.55, M.frame);
+  B(sw, 14.6, 21.4, .03, .035, 19.6, 27.2, std('#2a2e33', { roughness: .9 }), { cast: false });
+  for (let i = 0; i < 6; i++) B(sw, 14.6, 17.9, .035, .04 + i * .002, 19.8 + i * 1.2, 20.6 + i * 1.2, std('#5b6168', { roughness: .9 }), { cast: false });
+  B(sw, 14.5, 21.5, 0, 3.2, 19.45, 19.55, M.frame);
 }
 // terrace sit-out under the shed
 {
   const s = item(G.site, 'Terrace sit-out', 'Terrace', 'Covered terrace over the shop and veranda, under the jasta shed. Room for chairs, drying clothes, plants.');
-  C(s, 20, 1.2, 1.35, 6, 1.3, M.oak, 32); C(s, 20, .03, 1.2, 6, .12, M.black, 12);
-  for (const [x, z] of [[18.1, 6], [21.9, 6], [20, 4.1]]) { B(s, x - .7, x + .7, .03, 1.5, z - .7, z + .7, M.fabric2); }
+  C(s, 19.5, 1.2, 1.35, 6.5, 1.3, M.oak, 32); C(s, 19.5, .03, 1.2, 6.5, .12, M.black, 12);
+  for (const [x, z] of [[17.6, 6.5], [21.4, 6.5], [19.5, 4.6]]) { B(s, x - .7, x + .7, .03, 1.5, z - .7, z + .7, M.fabric2); }
 }
 
 // ---------- floors ----------
 const fl = item(G.furniture, 'Engineered wood floor', 'Finish', 'Wood-look flooring in both rooms, laid on the levelled slab.');
-B(fl, XL + T / 2, XM - T / 2, .03, .07, ZN + T / 2, ZA - T / 2, floorMat(woodTex, 13.4, 9.4), { cast: false });
+B(fl, XL + T / 2, XM - T / 2, .03, .07, ZN + T / 2, ZA - T / 2, floorMat(woodTex, 13.4, 10.4), { cast: false });
 B(fl, XW + T / 2, XM - T / 2, .03, .07, ZB2 + T / 2, ZS - T / 2, floorMat(woodTex, 9.6, 11.4), { cast: false });
 const bf = item(G.furniture, 'Bathroom floor', 'Finish', 'Anti-slip tile on a waterproof membrane, falling to the floor trap. Turned up the walls at least 6 in.');
 B(bf, XL + T / 2, 8.5 - T / 2, .03, .08, ZA + T / 2, ZB2 - T / 2, floorMat(tileTex, 7.7, 4.4), { cast: false });
@@ -454,8 +455,8 @@ const door = (a, b) => ({ a, b, y0: 0, y1: DOOR }), win = (a, b, y0 = SILL, y1 =
 const IN_ = [-T / 2, -T / 2]; // z-runs sit between x-runs
 const RCC = std('#c9c4bb', { roughness: .95 });
 const O = {
-  nrEast: win(2.5, 7), lobbyDoor: door(10.6, 13.4), bathDoor: door(11.6, 13.9),
-  bathVent: win(11.4, 13.1, 6.6, 8), stairDoor: door(16.3, 19.3),
+  nrEast: win(3, 7.5), lobbyDoor: door(10.6, 13.4), bathDoor: door(12.6, 14.9),
+  bathVent: win(12.4, 14.1, 6.6, 8), stairDoor: door(16.3, 19.3),
 };
 // north room shell (shared by all options)
 run('x', ZN, XL, XM);                                        // north wall
@@ -468,8 +469,8 @@ run('x', ZB2, XL, 8.5);                                      // south — also t
 // south room east wall = RCC stair-cover west wall
 run('z', XM, ZB2, ZS, [], IN_, H, RCC);
 // RCC stair cover (mumty) over the existing stair, tank on top
-run('x', 15.25, XM, XS, [O.stairDoor], [-T / 2, T / 2], MH, RCC);
-run('z', XS, 15.25, ZS, [], IN_, MH, RCC);
+run('x', 16.25, XM, XS, [O.stairDoor], [-T / 2, T / 2], MH, RCC);
+run('z', XS, 16.25, ZS, [], IN_, MH, RCC);
 run('x', ZS, XM, XS, [], [-T / 2, T / 2], MH, RCC);
 
 const capMats = m => [m, m, M.cap, m, m, m];
@@ -507,7 +508,7 @@ const RP = .45, RT = .25, RIDGE_X = (XL + XM) / 2, RIDGE_Y = H + (RIDGE_X - XL) 
 for (const z of [ZN, ZS]) triZ(upper, z, [[XL - T / 2, H], [XM + T / 2, H], [RIDGE_X, RIDGE_Y]], M.wall);
 B(upper, XL - .1, XW + .2, H - .6, H, ZS - .2, ZS + .2, M.roofEdge); // beam over the balcony opening
 // stair-cover slab edge fill above the door wall
-B(upper, XM, XS + .2, MH - .01, MH, 15.05, 15.45, RCC);
+B(upper, XM, XS + .2, MH - .01, MH, 16.05, 16.45, RCC);
 
 // ---------- doors & windows ----------
 /** Door in a wall. axis 'x': wall along x at z = wall. axis 'z': wall along z at x = wall.
@@ -544,16 +545,16 @@ windowIn('North room east window', 'East-facing UPVC window onto the covered ter
 windowIn('Bath ventilator', 'High-level obscured glass on the west wall, with the exhaust fan beside it.', 'z', XL, O.bathVent);
 doorway('Bathroom door', 'Door', '2 ft 3 in door from the lobby. The bath sits right over the existing toilet, so the WC and shower drop straight into the old soil stack.', O.bathDoor.a, O.bathDoor.b, 8.5, false, M.doorBath, { axis: 'z', inward: -1, open: .7 });
 doorway('North room door', 'Door', '3 ft door from the lobby into the north room.', O.lobbyDoor.a, O.lobbyDoor.b, ZA, false, M.door);
-doorway('Stair-cover door', 'Door', 'Steel door at the top of the existing stair, opening onto the lobby and terrace.', O.stairDoor.a, O.stairDoor.b, 15.25, true, M.door, { inward: 1 });
+doorway('Stair-cover door', 'Door', 'Steel door at the top of the existing stair, opening onto the lobby and terrace.', O.stairDoor.a, O.stairDoor.b, 16.25, true, M.door, { inward: 1 });
 // balcony railing on the open west and south edges
 {
   const r = item(openings, 'Balcony railing', 'Balcony', 'Steel railing on top of the existing parapet line, 3.5 ft above the floor.');
-  B(r, 0, .5, 0, 1.2, ZB2 + T / 2, 27, M.parapet); B(r, 0, XW - T / 2, 0, 1.2, 26.5, 27, M.parapet);
-  for (let z = ZB2 + .6; z < 26.8; z += 1.2) B(r, .2, .3, 1.2, 3.5, z - .05, z + .05, M.black);
-  for (let x = .8; x < XW - .3; x += 1.2) B(r, x - .05, x + .05, 1.2, 3.5, 26.7, 26.8, M.black);
-  B(r, .15, .35, 3.45, 3.6, ZB2 + T / 2, 26.85, M.black); B(r, .15, XW - T / 2, 3.45, 3.6, 26.65, 26.85, M.black);
+  B(r, 0, .5, 0, 1.2, ZB2 + T / 2, 28, M.parapet); B(r, 0, XW - T / 2, 0, 1.2, 27.5, 28, M.parapet);
+  for (let z = ZB2 + .6; z < 27.8; z += 1.2) B(r, .2, .3, 1.2, 3.5, z - .05, z + .05, M.black);
+  for (let x = .8; x < XW - .3; x += 1.2) B(r, x - .05, x + .05, 1.2, 3.5, 27.7, 27.8, M.black);
+  B(r, .15, .35, 3.45, 3.6, ZB2 + T / 2, 27.85, M.black); B(r, .15, XW - T / 2, 3.45, 3.6, 27.65, 27.85, M.black);
   const post = item(openings, 'Balcony corner post', 'Balcony', 'Steel post carrying the roof edge over the open balcony corner.');
-  B(post, .2, .55, 0, H, 26.45, 26.8, M.frame);
+  B(post, .2, .55, 0, H, 27.45, 27.8, M.frame);
 }
 
 // ---------- roofs ----------
@@ -569,12 +570,12 @@ function slopeX(parent, z0, z1, xLow, xHigh, yLowSurface, a, mat) {
 const roofMat = std('#ffffff', { map: (() => { const t = seamTex.clone(); t.needsUpdate = true; t.center.set(.5, .5); t.rotation = Math.PI / 2; t.repeat.set(7, 1); return t; })(), metalness: .35, roughness: .45 });
 const RA = Math.atan(RP), ov = .8, eaveY = H - ov * RP;
 const roofW = item(G.roof, 'Gable roof — west rooms, bath and balcony', 'Roof', 'EPS sandwich roof panels, ridge running north–south, 0.8 ft eaves. Covers both rooms, the bath, the lobby and the balcony, so none of that slab is exposed.');
-slopeX(roofW, ZN - .9, 27.4, XL - ov, RIDGE_X, eaveY, RA, roofMat);
-slopeX(roofW, ZN - .9, 27.4, XM + ov, RIDGE_X, eaveY, RA, roofMat);
-{ const r = new THREE.Mesh(new THREE.BoxGeometry(.7, .3, 28.3), M.roofEdge); r.position.set(RIDGE_X, RIDGE_Y + RT + .05, 13.25); r.castShadow = true; roofW.add(r); }
+slopeX(roofW, ZN - .9, 28.4, XL - ov, RIDGE_X, eaveY, RA, roofMat);
+slopeX(roofW, ZN - .9, 28.4, XM + ov, RIDGE_X, eaveY, RA, roofMat);
+{ const r = new THREE.Mesh(new THREE.BoxGeometry(.7, .3, 29.3), M.roofEdge); r.position.set(RIDGE_X, RIDGE_Y + RT + .05, 13.75); r.castShadow = true; roofW.add(r); }
 // RCC stair-cover slab + tank platform (hidden in cutaway views)
 const mumty = item(G.walls, 'RCC stair cover (mumty)', 'Structure', 'New RCC cover over the existing stair, about 7.75 × 11.4 ft, 8.5 ft high. Its slab carries the water tank, so the tank load goes down the stair walls and columns, not onto the open slab.');
-B(mumty, XM - .3, XS + .5, MH, MH + .5, 14.8, 27.05, RCC); high.push(mumty);
+B(mumty, XM - .3, XS + .5, MH, MH + .5, 15.8, 28.05, RCC); high.push(mumty);
 // jasta (CGI) shed over the east terrace — salvaged sheets first, new ones to make up the rest
 const jastaTex = canvasTex(128, (g, s) => {
   for (let i = 0; i < s; i++) { const v = 150 + 55 * Math.sin(i / s * Math.PI * 2 * 4); g.fillStyle = `rgb(${v * .78},${v * .86},${v * .92})`; g.fillRect(0, i, s, 1); }
@@ -583,11 +584,11 @@ const jasta = std('#ffffff', { map: jastaTex, metalness: .6, roughness: .45, sid
 const SA = Math.atan(1 / 8), shedY = x => 9.3 - (x - 14.4) / 8;
 const shed = item(G.roof, 'Jasta shed — east terrace', 'Roof', 'Corrugated GI sheet roof on steel posts over the east half (shop + veranda side), sloping 1:8 to a gutter on the east edge. Reuse the sheets from the demolished room first and buy new ones for the rest. Keeps rain off the leaking slab and gives a covered terrace.');
 {
-  slopeX(shed, -.5, 15.0, 26.7, 14.4, shedY(26.7), SA, jasta);
-  slopeX(shed, 15.0, 22.75, 26.7, XS + .2, shedY(26.7), SA, jasta);
-  B(shed, 26.55, 26.9, shedY(26.7) - .45, shedY(26.7) - .1, -.6, 22.85, M.roofEdge); // gutter
-  for (const z of [.2, 5.4, 10.6, 15.6, 21.9]) B(shed, 25.85, 26.1, 0, shedY(26), z - .12, z + .12, M.black);
-  B(shed, 14.3, 14.55, 0, shedY(14.4), 14.8, 15.05, M.black); // post at the lobby / stair corner
+  slopeX(shed, -.5, 16.0, 25.7, 14.4, shedY(25.7), SA, jasta);
+  slopeX(shed, 16.0, 23.75, 25.7, XS + .2, shedY(25.7), SA, jasta);
+  B(shed, 25.55, 25.9, shedY(25.7) - .45, shedY(25.7) - .1, -.6, 23.85, M.roofEdge); // gutter
+  for (const z of [.2, 5.6, 11, 16.6, 22.9]) B(shed, 24.85, 25.1, 0, shedY(25), z - .12, z + .12, M.black);
+  B(shed, 14.3, 14.55, 0, shedY(14.4), 15.8, 16.05, M.black); // post at the lobby / stair corner
 }
 
 // ---------- bathroom fittings ----------
@@ -607,10 +608,10 @@ const F = G.furniture;
   B(mir, 4.4, 5.9, 3.9, 6.1, ZB2 - T / 2 - .06, ZB2 - T / 2, M.mirror);
   const sh = item(F, 'Shower', 'Bathroom', 'Shower at the west end, about 2.4 × 4.3 ft, with a half-height glass screen. Floor falls to a trapped drain; walls waterproofed full height.');
   B(sh, XL + T / 2, 3.0, .08, .1, ZA + T / 2, ZB2 - T / 2, floorMat(tileTex, 2.4, 4.4), { cast: false });
-  B(sh, 2.97, 3.03, .1, 6.6, ZA + T / 2, 12.9, M.bathGlass, { cast: false });
-  B(sh, 2.95, 3.05, 6.55, 6.62, ZA + T / 2, 12.9, M.fitting);
-  C(sh, 1.6, 6.4, 6.5, 12.5, .38, M.fitting, 24);
-  B(sh, XL + T / 2, 1.6, 6.45, 6.55, 12.45, 12.55, M.fitting);
+  B(sh, 2.97, 3.03, .1, 6.6, ZA + T / 2, 13.9, M.bathGlass, { cast: false });
+  B(sh, 2.95, 3.05, 6.55, 6.62, ZA + T / 2, 13.9, M.fitting);
+  C(sh, 1.6, 6.4, 6.5, 13.5, .38, M.fitting, 24);
+  B(sh, XL + T / 2, 1.6, 6.45, 6.55, 13.45, 13.55, M.fitting);
 }
 
 // ---------- service points ----------
@@ -642,33 +643,33 @@ function ac(wall, face, c, name) {
   high.push(g);
 }
 // bath + lobby (shared)
-point('switch', 8.5 - T / 2 - IN, 4, 11.1, 'Bathroom switches', 'Light + exhaust fan, inside by the door, away from the shower.');
-point('socket', 8.5 - T / 2 - IN, 5.6, 10.9, 'Geyser supply', 'Fused spur + RCD for the water heater, high up and away from the shower.');
-point('hvac', fW, 7.4, 13.7, 'Bathroom exhaust fan', 'Ducted out through the west wall next to the ventilator.');
-point('light', 4.4, 9.6, 12.5, 'Bathroom light', 'Sealed IP44+ fitting.');
+point('switch', 8.5 - T / 2 - IN, 4, 12.1, 'Bathroom switches', 'Light + exhaust fan, inside by the door, away from the shower.');
+point('socket', 8.5 - T / 2 - IN, 5.6, 11.9, 'Geyser supply', 'Fused spur + RCD for the water heater, high up and away from the shower.');
+point('hvac', fW, 7.4, 14.7, 'Bathroom exhaust fan', 'Ducted out through the west wall next to the ventilator.');
+point('light', 4.4, 9.6, 13.5, 'Bathroom light', 'Sealed IP44+ fitting.');
 point('light', 5.15, 6.6, ZB2 - T / 2 - IN, 'Vanity light', 'Above the mirror.');
-point('light', 11.3, 9.6, 12.5, 'Lobby light', 'Two-way switched from the stair door and the room doors.');
-point('switch', 14.6, 4, 15.25 - T / 2 - IN, 'Lobby switch', 'By the stair door: lobby light and terrace lights.');
+point('light', 11.3, 9.6, 13.5, 'Lobby light', 'Two-way switched from the stair door and the room doors.');
+point('switch', 14.6, 4, 16.25 - T / 2 - IN, 'Lobby switch', 'By the stair door: lobby light and terrace lights.');
 point('light', 20, 8.6, 7, 'Terrace light', 'Outdoor-rated batten under the jasta shed.');
 point('socket', XE - .3, 1.2, 12, 'Terrace socket', 'Weatherproof IP65 outdoor socket.');
 point('water', 5.15, 2.2, ZB2 - T / 2 - .3, 'Basin supply + waste', 'Hot/cold angle valves and a bottle trap in the vanity.');
 point('water', 4.9, .3, ZA + 1.35, 'WC soil outlet', 'Drops straight into the existing toilet stack below — confirm the stack position on site before fixing the WC.');
 point('water', 5.8, 1.5, ZA + T / 2 + IN, 'WC cold supply', 'Angle valve beside the cistern.');
-point('water', 1.8, .3, 12.5, 'Shower drain', 'Trapped floor drain over the existing toilet drain; floor falls ~1:60 to it.');
-point('water', fW, 3.8, 12.5, 'Shower mixer', 'Concealed mixer, hot + cold.');
-point('water', 18, 9.4, 21, 'Tank outlet', 'Gravity feed from the tank on the stair cover down to the bath.');
+point('water', 1.8, .3, 13.5, 'Shower drain', 'Trapped floor drain over the existing toilet drain; floor falls ~1:60 to it.');
+point('water', fW, 3.8, 13.5, 'Shower mixer', 'Concealed mixer, hot + cold.');
+point('water', 18, 9.4, 22, 'Tank outlet', 'Gravity feed from the tank on the stair cover down to the bath.');
 const gy = item(G.plumbing, 'Water heater (geyser)', 'Plumbing', '15–25 L electric geyser high on the wall by the door, outside the shower zone, with RCD protection and proper earthing.');
-C(gy, 7.75, 6.5, 8.2, 11.1, .5, M.ceramic, 24); high.push(gy);
+C(gy, 7.75, 6.5, 8.2, 12.1, .5, M.ceramic, 24); high.push(gy);
 
 // ---------- water tank on the RCC stair cover ----------
 {
   const tk = item(G.tank, 'Water tank — 1,000 L', 'Water tank', 'On the new RCC stair-cover slab, so its ~1 tonne sits on the stair walls and columns. Gravity-feeds the bath; reach it by the steel ladder on the east side.');
-  C(tk, 18, MH + .5, MH + 4.4, 21, 1.65, M.tank, 40, 1.75);
-  C(tk, 18, MH + 4.4, MH + 4.8, 21, .7, M.tank, 32, 1.4);
-  for (const y of [MH + 1.5, MH + 2.5, MH + 3.5]) C(tk, 18, y, y + .12, 21, 1.78, M.tank, 40);
+  C(tk, 18, MH + .5, MH + 4.4, 22, 1.65, M.tank, 40, 1.75);
+  C(tk, 18, MH + 4.4, MH + 4.8, 22, .7, M.tank, 32, 1.4);
+  for (const y of [MH + 1.5, MH + 2.5, MH + 3.5]) C(tk, 18, y, y + .12, 22, 1.78, M.tank, 40);
   const lad = item(G.tank, 'Tank ladder', 'Water tank', 'Steel ladder on the east face of the stair cover for tank cleaning.');
-  for (const z of [18.6, 20]) B(lad, XS + .25, XS + .35, 0, MH + 3.4, z - .05, z + .05, M.black);
-  for (let y = .9; y < MH + 3.2; y += .9) B(lad, XS + .25, XS + .35, y, y + .07, 18.6, 20, M.black);
+  for (const z of [19.6, 21]) B(lad, XS + .25, XS + .35, 0, MH + 3.4, z - .05, z + .05, M.black);
+  for (let y = .9; y < MH + 3.2; y += .9) B(lad, XS + .25, XS + .35, y, y + .07, 19.6, 21, M.black);
   high.push(tk, lad);
 }
 
@@ -773,9 +774,9 @@ function rug(F, x0, x1, z0, z1) { const g = item(F, 'Rug', 'Finish', ''); B(g, x
 function coffee(F, x, z, r = 1) { const g = item(F, 'Coffee table', 'Lounge', 'Low round table.'); C(g, x, 1.2, 1.35, z, r, M.oak, 36); C(g, x, .07, 1.2, z, .12, M.black, 12); }
 function balconySet(F) {
   const g = item(F, 'Balcony seating', 'Balcony', 'Two chairs and a side table on the covered west balcony — evening sun.');
-  for (const z of [17.2, 20.2]) { B(g, .9, 2.6, .07, 1.5, z - .8, z + .8, M.fabric2); B(g, .7, 1.0, 1.5, 3, z - .8, z + .8, M.fabric2); }
-  C(g, 1.8, .07, 1.7, 18.7, .45, M.oak, 24);
-  plant(g, 1.4, 25.4, .9);
+  for (const z of [18.2, 21.2]) { B(g, .9, 2.6, .07, 1.5, z - .8, z + .8, M.fabric2); B(g, .7, 1.0, 1.5, 3, z - .8, z + .8, M.fabric2); }
+  C(g, 1.8, .07, 1.7, 19.7, .45, M.oak, 24);
+  plant(g, 1.4, 26.4, .9);
 }
 
 // shared south-room shell pieces per option: north wall (door), west wall (balcony door), south wall (window)
@@ -797,10 +798,10 @@ function southShell(L, doorA, balc, sWin) {
 
 // ---------- A · office north, bed + lounge south ----------
 defineLayout('a', {
-  stats: [['Office', '13 × 9 ft'], ['Bed + lounge', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
+  stats: [['Office', '13 × 10 ft'], ['Bed + lounge', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
   note: 'Office in the north room with an east window. South room is the bedroom, with a small lounge corner behind a curtain and the west balcony off it.',
   zones: ['Office', 'Bed + lounge'],
-  labels: [['Office', '13 × 9 ft', [6.5, .3, 5.6]], ['Lounge', '', [9.2, .3, 18.2]], ['Bed', '', [9.2, .3, 23.6]]],
+  labels: [['Office', '13 × 10 ft', [6.5, .3, 6]], ['Lounge', '', [9.2, .3, 19.2]], ['Bed', '', [9.2, .3, 24.6]]],
 }, (L, F) => {
   const w = win(3, 7);
   run('z', XL, ZN, ZA, [w], IN_);
@@ -812,12 +813,12 @@ defineLayout('a', {
   { const rc = item(F, 'Reading chair', 'Office', 'Second seat for calls and reading.'); B(rc, .9, 2.7, .5, 1.5, .9, 2.7, M.fabric2); B(rc, .7, 1.0, 1.5, 3.2, .9, 2.7, M.fabric2); }
   rug(F, 4.2, 12.4, 3, 8.6);
   // south room
-  southShell(L, door(8.75, 11.25), win(15.6, 19.6, 0, DOOR), win(8.4, 11.4));
-  sofa(F, 'Loveseat', 'Two-seater facing the balcony door — the lounge corner.', 'e', XM - T / 2, 15.5, 19.5, 2.5);
-  coffee(F, 9.7, 18.9, .7);
-  curtain(L, 'Curtain divider', 'Ceiling-track curtain across the room. Draw it to close the bed off from the lounge corner and the door.', 'x', 20.4, XW + .3, XM - .3, .78);
-  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the stair-cover wall (solid RCC — quiet).', 'e', XM - T / 2, 23.4);
-  wardrobe(F, 'w', XW + T / 2, 23.7, 26.4);
+  southShell(L, door(8.75, 11.25), win(16.6, 20.6, 0, DOOR), win(8.4, 11.4));
+  sofa(F, 'Loveseat', 'Two-seater facing the balcony door — the lounge corner.', 'e', XM - T / 2, 16.5, 20.5, 2.5);
+  coffee(F, 9.7, 19.9, .7);
+  curtain(L, 'Curtain divider', 'Ceiling-track curtain across the room. Draw it to close the bed off from the lounge corner and the door.', 'x', 21.4, XW + .3, XM - .3, .78);
+  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the stair-cover wall (solid RCC — quiet).', 'e', XM - T / 2, 24.4);
+  wardrobe(F, 'w', XW + T / 2, 24.7, 27.4);
   // services
   point('switch', 13.8, 4, fA, 'Office switches', 'Light + fan, latch side of the door.');
   point('socket', 6.4, 1.2, fN, 'Desk power (×2)', 'Dedicated circuit for the workstation, surge-protected.');
@@ -827,59 +828,59 @@ defineLayout('a', {
   point('light', 7.2, 9.6, 5.2, 'Office ceiling light', 'LED panel, neutral white (4000 K) for working.');
   ac('n', ZN + T / 2, 2.6, 'Office AC');
   point('switch', 11.6, 4, fBs, 'South room switches', 'Lounge light, fan, two-way for the bed light.');
-  point('socket', fM, 1, 15.6, 'Lounge socket', 'Side lamp and charging.');
-  point('socket', fM, 2.3, 20.7, 'Bedside socket', 'Phone charging, with USB-C.');
-  point('switch', fM, 2.6, 26.1, 'Bedside switch', 'Two-way for the bed light.');
-  point('light', fM, 4.6, 20.7, 'Reading light', 'Swing-arm wall light over the bed.');
-  point('light', 9.2, 9.6, 17.8, 'Lounge light', 'Warm dimmable LED.');
-  point('light', 9.2, 9.6, 23.4, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
+  point('socket', fM, 1, 16.6, 'Lounge socket', 'Side lamp and charging.');
+  point('socket', fM, 2.3, 21.7, 'Bedside socket', 'Phone charging, with USB-C.');
+  point('switch', fM, 2.6, 27.1, 'Bedside switch', 'Two-way for the bed light.');
+  point('light', fM, 4.6, 21.7, 'Reading light', 'Swing-arm wall light over the bed.');
+  point('light', 9.2, 9.6, 18.8, 'Lounge light', 'Warm dimmable LED.');
+  point('light', 9.2, 9.6, 24.4, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
   ac('s', ZS - T / 2, 11.6, 'Bedroom AC');
 });
 
 // ---------- B · living north, bed + desk south ----------
 defineLayout('b', {
-  stats: [['Living', '13 × 9 ft'], ['Bed + office', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
+  stats: [['Living', '13 × 10 ft'], ['Bed + office', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
   note: 'Living room in the north room. South room is bedroom and office together: bed by the door, desk at the south window behind a curtain.',
   zones: ['Living', 'Bed + desk'],
-  labels: [['Living', '13 × 9 ft', [6.5, .3, 5.6]], ['Bed', '', [7.8, .3, 18.2]], ['Desk', '', [8.4, .3, 23.6]]],
+  labels: [['Living', '13 × 10 ft', [6.5, .3, 6]], ['Bed', '', [7.8, .3, 19.2]], ['Desk', '', [8.4, .3, 24.6]]],
 }, (L, F) => {
   run('z', XL, ZN, ZA, [], IN_);
-  tv(F, 'w', XL + T / 2, 5);
+  tv(F, 'w', XL + T / 2, 5.5);
   sofa(F, 'Sofa', 'Three-seater against the east wall under the window, ~11 ft from the TV.', 'e', XM - T / 2, 1.3, 7.2);
   coffee(F, 7, 4.3, 1.1);
   shelf(F, 'n', ZN + T / 2, 4, 8);
   rug(F, 3.5, 10.8, 1.6, 7.6);
   // south room
-  southShell(L, door(11.35, 13.75), win(22, 25.6, 0, DOOR), win(11, 13.6));
-  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the balcony-side wall, clear of the door swing.', 'w', XW + T / 2, 18.1);
-  curtain(L, 'Curtain divider', 'Ceiling-track curtain between the bed and the desk — work late without waking anyone.', 'x', 21.1, XW + .3, XM - .3, .78);
+  southShell(L, door(11.35, 13.75), win(23, 26.6, 0, DOOR), win(11, 13.6));
+  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the balcony-side wall, clear of the door swing.', 'w', XW + T / 2, 19.1);
+  curtain(L, 'Curtain divider', 'Ceiling-track curtain between the bed and the desk — work late without waking anyone.', 'x', 22.1, XW + .3, XM - .3, .78);
   desk(F, 's', ZS - T / 2, 4.7, 10.5);
   taskChair(F, 's', ZS - T / 2, 7.6);
-  wardrobe(F, 'e', XM - T / 2, 19, 21);
+  wardrobe(F, 'e', XM - T / 2, 20, 22);
   // services
   point('switch', 10.3, 4, fA, 'Living switches', 'Light, fan, dimmer.');
-  point('socket', fW, 1.2, 3.4, 'TV / console power', 'Behind the console, with space for a small UPS.');
-  point('data', fW, 1.5, 5, 'TV CAT6', 'Wired data for the TV; HDMI conduit to the TV plate.');
+  point('socket', fW, 1.2, 3.9, 'TV / console power', 'Behind the console, with space for a small UPS.');
+  point('data', fW, 1.5, 5.5, 'TV CAT6', 'Wired data for the TV; HDMI conduit to the TV plate.');
   point('socket', fM, 1, 8.4, 'Sofa-side socket', 'Side lamp and charging.');
   point('light', 7.2, 9.6, 5.2, 'Living light', 'Warm dimmable LED.');
   ac('n', ZN + T / 2, 10.8, 'Living AC');
   point('switch', 11, 4, fBs, 'South room switches', 'Bed light (two-way) and fan.');
-  point('socket', fWb, 2.3, 15.5, 'Bedside socket', 'Phone charging, with USB-C.');
-  point('light', fWb, 4.6, 15.5, 'Reading light', 'Swing-arm wall light.');
+  point('socket', fWb, 2.3, 16.5, 'Bedside socket', 'Phone charging, with USB-C.');
+  point('light', fWb, 4.6, 16.5, 'Reading light', 'Swing-arm wall light.');
   point('socket', 5.8, 1.2, fS, 'Desk power (×2)', 'Dedicated circuit, surge-protected.');
   point('socket', 9.4, 1.2, fS, 'Desk power (×2)', 'Second double socket.');
   point('data', 7.6, 1.2, fS, 'Desk CAT6 (×2)', 'Two RJ45 ports home-run to the router.');
-  point('light', 9.2, 9.6, 18, 'Bedroom light', 'Warm dimmable LED (2700 K).');
-  point('light', 9.2, 9.6, 23.8, 'Desk light', 'Neutral-white LED (4000 K).');
-  ac('e', XM - T / 2, 23.8, 'Bedroom AC');
+  point('light', 9.2, 9.6, 19, 'Bedroom light', 'Warm dimmable LED (2700 K).');
+  point('light', 9.2, 9.6, 24.8, 'Desk light', 'Neutral-white LED (4000 K).');
+  ac('e', XM - T / 2, 24.8, 'Bedroom AC');
 });
 
 // ---------- C · office + lounge north, bedroom south ----------
 defineLayout('c', {
-  stats: [['Office + lounge', '13 × 9 ft'], ['Bedroom', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
+  stats: [['Office + lounge', '13 × 10 ft'], ['Bedroom', '9.5 × 11 ft'], ['Bath', '7.7 × 4.3 ft'], ['Balcony', '4 × 12 ft']],
   note: 'North room is office and lounge together. South room is a plain bedroom with the balcony off it.',
   zones: ['Office + lounge', 'Bedroom'],
-  labels: [['Office + lounge', '13 × 9 ft', [6.5, .3, 6.4]], ['Bedroom', '9.5 × 11 ft', [9, .3, 24.9]]],
+  labels: [['Office + lounge', '13 × 10 ft', [6.5, .3, 6.9]], ['Bedroom', '9.5 × 11 ft', [9, .3, 25.9]]],
 }, (L, F) => {
   const w = win(2.5, 7);
   run('z', XL, ZN, ZA, [w], IN_);
@@ -890,10 +891,10 @@ defineLayout('c', {
   coffee(F, 5.2, 4.8, .8);
   shelf(F, 'n', ZN + T / 2, .8, 4.6);
   // south room
-  southShell(L, door(8.75, 11.25), win(16.8, 20.6, 0, DOOR), win(7.4, 11.4));
-  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the RCC stair-cover wall.', 'e', XM - T / 2, 21.3);
-  nightstand(F, 'e', XM - T / 2, 17.8); nightstand(F, 'e', XM - T / 2, 24.8);
-  wardrobe(F, 'w', XW + T / 2, 22.6, 26.4);
+  southShell(L, door(8.75, 11.25), win(17.8, 21.6, 0, DOOR), win(7.4, 11.4));
+  bed(F, 'Queen bed', '5 × 6.7 ft queen, headboard on the RCC stair-cover wall.', 'e', XM - T / 2, 22.3);
+  nightstand(F, 'e', XM - T / 2, 18.8); nightstand(F, 'e', XM - T / 2, 25.8);
+  wardrobe(F, 'w', XW + T / 2, 23.6, 27.4);
   // services
   point('switch', 13.8, 4, fA, 'Room switches', 'Office light, lounge light, fan.');
   point('socket', 8.8, 1.2, fN, 'Desk power (×2)', 'Dedicated circuit, surge-protected.');
@@ -904,22 +905,22 @@ defineLayout('c', {
   point('light', 4.5, 9.6, 5.5, 'Lounge light', 'Warm dimmable LED.');
   ac('n', ZN + T / 2, 2.7, 'AC');
   point('switch', 11.6, 4, fBs, 'Bedroom switches', 'Light (two-way), fan.');
-  point('socket', fM, 2.3, 17.2, 'Bedside socket', 'With USB-C.');
-  point('socket', fM, 2.3, 25.4, 'Bedside socket', 'With USB-C.');
-  point('light', fM, 4.6, 17.2, 'Reading light', 'Swing-arm wall light.');
-  point('light', fM, 4.6, 25.4, 'Reading light', 'Swing-arm wall light.');
-  point('light', 9.2, 9.6, 21, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
+  point('socket', fM, 2.3, 18.2, 'Bedside socket', 'With USB-C.');
+  point('socket', fM, 2.3, 26.4, 'Bedside socket', 'With USB-C.');
+  point('light', fM, 4.6, 18.2, 'Reading light', 'Swing-arm wall light.');
+  point('light', fM, 4.6, 26.4, 'Reading light', 'Swing-arm wall light.');
+  point('light', 9.2, 9.6, 22, 'Bedroom light', 'Warm dimmable LED (2700 K), two-way switched.');
   ac('s', ZS - T / 2, 9.4, 'Bedroom AC');
 });
 
 // ---------- room labels (HTML) ----------
 const labelsEl = document.getElementById('labels');
 const ROOMS = [
-  ['Bath', '7.7 × 4.3 ft', [4.4, .3, 12.5]],
-  ['Lobby', '', [11.3, .3, 12.5]],
-  ['Balcony', '', [2.1, .3, 22.6]],
-  ['Covered terrace', '', [20, .3, 10.5]],
-  ['Stair + tank', 'RCC', [18, .3, 20.5]],
+  ['Bath', '7.7 × 4.3 ft', [4.4, .3, 13.5]],
+  ['Lobby', '', [11.3, .3, 13.5]],
+  ['Balcony', '', [2.1, .3, 23.6]],
+  ['Covered terrace', '', [19.5, .3, 11]],
+  ['Stair + tank', 'RCC', [18, .3, 21.5]],
   ...Object.values(LAYOUTS).flatMap(L => L.labels.map(l => [...l, L.key])),
 ].map(([n, s, p, lay]) => {
   const el = document.createElement('div'); el.className = 'room'; el.innerHTML = `${n}${s ? `<small>${s}</small>` : ''}`;
@@ -942,17 +943,17 @@ labelsEl.querySelectorAll('.room').forEach(e => { e.style.left = '0'; e.style.to
 const VIEWS = isSmall ? {
   exterior: [[-12, 36, 100], [13, -7, 12], true, false],
   dollhouse: [[-22, 52, 54], [12, 0, 13.5], false, true],
-  plan: [[13.1, 84, 13.6], [13.1, 0, 13.5], false, true],
+  plan: [[12.6, 86, 14.1], [12.6, 0, 14], false, true],
   left: [[6.5, 30, 27], [6.5, 1, 5], false, true],
-  right: [[-14, 30, 34], [8, 1, 20.5], false, true],
-  bath: [[5, 40, 32], [5, 0, 12.4], false, true],
+  right: [[-14, 30, 35], [8, 1, 21.5], false, true],
+  bath: [[5, 40, 33], [5, 0, 13.4], false, true],
 } : {
   exterior: [[-6, 26, 78], [14, -7, 12], true, false],
   dollhouse: [[-17, 38, 44], [12, 0, 13.5], false, true],
-  plan: [[13.1, 58, 13.52], [13.1, 0, 13.5], false, true],
+  plan: [[12.6, 60, 14.02], [12.6, 0, 14], false, true],
   left: [[6.5, 22, 23], [6.5, 1, 5], false, true],
-  right: [[-11, 22, 30], [8.5, 1, 20.5], false, true],
-  bath: [[5, 30, 25], [5, 0, 12.4], false, true],
+  right: [[-11, 22, 31], [8.5, 1, 21.5], false, true],
+  bath: [[5, 30, 26], [5, 0, 13.4], false, true],
 };
 const roofBox = document.querySelector('[data-layer=roof]'), cutBox = document.getElementById('cut');
 function setRoof(on) { G.roof.visible = roofBox.checked = on; }
