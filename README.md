@@ -1,12 +1,18 @@
 # Rooftop Design – 3D Renovation Concept
 
-An interactive mobile-friendly Three.js model of a proposed rooftop home office (9 × 10 ft), living room (11 × 10 ft), and **separately accessible** bathroom (5 × 7 ft) with 10 ft walls and sloped EPS roofs.
+An interactive, mobile-friendly Three.js model of the rooftop addition on the existing house at plot 268 (Tikathali). The footprint follows the approved ground-floor drawing: about 26'3" × 27', 690 sq ft of roof slab.
+
+**The plan**
+- The brick room with the jasta roof at the south-west comes down.
+- The west half gets the new rooms, the bath and a balcony. New walls sit on the existing wall lines, and the bath sits directly over the existing toilet so it drains into the same stack.
+- The stair gets an RCC cover with the 1,000 L water tank on its slab.
+- The east half becomes a covered terrace under a jasta shed: salvaged sheets from the old room first, new sheets for the rest, so the leaking slab is fully covered.
 
 ## Features
-- Three layout options (switch at the top, or link directly with `#a`, `#b`, `#c`):
-  - **A · Two rooms** — separate office and living room, each with its own door
-  - **B · Studio, bed right** — one open 20 × 10 ft room, no partition; desk by the door, bed behind a ceiling-track curtain
-  - **C · Studio, bed left** — open room with the bed at the far end behind a curtain; desk and a small TV lounge by the door
+- Three layout options for the west rooms (switch at the top, or link with `#a`, `#b`, `#c`):
+  - **A · Office + bed/lounge**: office in the north room with an east window; bedroom with a lounge corner behind a curtain in the south room
+  - **B · Living + bed/desk**: living room north; bedroom plus a south-facing desk behind a curtain south
+  - **C · Office/lounge + bedroom**: office and lounge share the north room; plain bedroom south
 - Curtain toggle to see the studio open or closed off
 - Full 3D orbit, zoom and pan on desktop and mobile, with smooth camera moves
 - Views: Exterior, Dollhouse (walls cut at 4.5 ft), Plan, and Office / Living / Bath close-ups
